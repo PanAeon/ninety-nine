@@ -56,3 +56,34 @@ spec =
 
        it "should repli n " $
           repli 3 ([1,2,3]) `shouldBe` [1,1,1,2,2,2,3,3,3]
+      describe "16 - drop nth" $ do
+        it "should drop []" $
+          drop' 3 ([]::[String]) `shouldBe` []
+        it "should drop nth eleme" $
+          drop' 3 [1,2,3,4,5,6] `shouldBe` [1,2,4,5]
+
+      describe "17 - split " $  do
+        it "should split list at n" $
+          split 3 [1,2,3,4,5,6] `shouldBe` ([1,2,3], [4,5,6])
+        it "should split list at 1" $
+          split 1 [1,2,3,4,5,6] `shouldBe` ([1], [2,3,4,5,6])
+        it "should split empty list at n" $
+          split 3 ([]::[String]) `shouldBe` ([], [])
+        it "should split at n > length xs" $
+          split 100 [1,2,3,4,5,6] `shouldBe` ([1,2,3,4,5,6], [])
+
+      describe "18 - slice" $ do
+        it "should slice list " $
+          slice 2 5 [1,2,3,4,5,6,7,8,9,0] `shouldBe` [2,3,4,5]
+
+      describe "19 - rotate" $ do
+        it "should rotate +3" $
+          rotate 3 [1,2,3,4,5,6] `shouldBe` [4,5,6,1,2,3]
+        it "should rotate +9" $
+          rotate 3 [1,2,3,4,5,6] `shouldBe` [4,5,6,1,2,3]
+        it "should rotate -3" $
+          rotate (-3) [1,2,3,4,5,6] `shouldBe` [4,5,6,1,2,3]
+
+      describe "20 - delete kth element" $ do
+        it  "should delete kth element from list" $
+          removeAt' 3 [1,2,3,4,5,6] `shouldBe` (3, [1,2,4,5,6])

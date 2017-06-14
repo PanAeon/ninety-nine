@@ -5,6 +5,10 @@ module Ex11to20
       , dupli
       , repli
       , drop'
+      , split
+      , slice
+      , rotate
+      , removeAt'
       , MList(Single, Multiple)
 
     ) where
@@ -104,6 +108,66 @@ repli' =  concatMap . replicate
 (**) Drop every N'th element from a list.
 -}
 
+drop'' :: Int -> [a] -> [a]
+drop'' n xs = toList $ fst $ foldlz f (z0, 1) z0
+        where
+          z0 = fromList xs
+          f (z, m) z1 | (mod m n) == 0 = (delete z, m + 1)
+                      | otherwise = (right z, m + 1)
+-- TODO: comprehensions
 drop' :: Int -> [a] -> [a]
-drop' n xs = undefined
-        where z0 = fromList xs
+drop' n = toList . (foldl (\z i ->
+                 if mod i n == 0 then
+                   delete z
+                 else
+                  right z
+              ) <$> fromList <*> idxs)
+        where
+          idxs = flip take [1..] . length
+-- n is a length of first list
+-- do not use any predefined predicates
+split :: Int -> [a] -> ([a], [a])
+split n []     = ([], [])
+split 0 xs     = ([], xs)
+split n (x:xs) = let (a,b) = split (n - 1) xs
+                 in (x:a, b)
+
+-- TODO: how the fuck it works?
+split' :: [a] -> Int -> ([a], [a])
+split' (x:xs) n | n > 0 = (:) x . fst &&& snd $ split' xs (n - 1)
+split' xs _             = ([], xs)
+
+{-
+Extract a slice from a list.
+
+Given two indices, i and k, the slice is the list containing the elements
+between the i'th and k'th element of the original list (both limits included).
+ Start counting the elements with 1.
+-}
+
+slice:: Int -> Int -> [a] -> [a]
+slice i k = take (k - i + 1) . (drop (i - 1))
+-- slice = ap (flip . (((.) . take) .) . flip flip 1 . ((+) .) . subtract) (drop . subtract 1)
+
+
+-- Rotate a list N places to the left.
+
+rotate:: Int -> [a] -> [a]
+rotate n xs = zs ++ ys
+         where
+           l = length xs
+           r = if (n > 0 ) then n `mod` l else (l+n) `mod` l
+           (ys, zs) = ( take r xs, drop r xs)
+
+rotate':: Int -> [a] -> [a]
+rotate' n xs = take len . drop (n `mod` len) . cycle $ xs
+      where len = length xs
+
+{- Problem 20 remove kth element from the list -}
+-- simple
+removeAt:: Int -> [a] -> [a]
+removeAt k = (++) <$> take k <*> drop (k + 1)
+
+-- zippers ! yay
+removeAt':: Int -> [a] -> (a, [a])
+removeAt' k xs = ((,) <$> cursor <*> (toList . delete) ) $ foldl (flip ($)) (fromList xs) (replicate (k-1) right)
