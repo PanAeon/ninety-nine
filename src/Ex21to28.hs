@@ -3,6 +3,9 @@ module Ex21to28
         insertAt'
       , range'
       , rndSelect
+      , diffSelect
+      , randomPermutation
+      , combinations
     ) where
 
 
@@ -11,11 +14,11 @@ module Ex21to28
 import Control.Monad
 import Control.Applicative
 import Control.Arrow((&&&))
-import Data.List(tails, group)
+import Data.List(tails, group, unfoldr,sortBy, sortOn)
 import Data.Maybe(listToMaybe)
 import Data.List.Zipper
 import System.Random
-
+import Ex11to20(removeAt')
 
 -- zippers ! yay
 insertAt':: Int -> a -> [a] -> [a]
@@ -39,3 +42,24 @@ rndSelect n xs = do
   gen <- newStdGen
   let rs = randomRs (0, length xs - 1) gen :: [Int]
   return $ map (xs!!) (take n rs) -- unfold??
+
+-- unfoldr :: (b -> Maybe (a, b)) -> b -> [a]
+diffSelect:: Int -> Int -> IO [Int]
+diffSelect n m = do
+                  gen <- newStdGen
+                  return $ take n $ unfoldr generate (gen, [1..m])
+            where
+              generate (g,xs) = let (n, g') = randomR (0, length xs - 1) g
+                                    (x, xs') = (removeAt' n xs)
+                                in
+                                  Just (x, (g', xs'))
+
+randomPermutation:: [a] -> IO [a]
+randomPermutation xs = newStdGen >>= \gen ->
+            return $ (map snd) . (sortOn fst) $ zip (randoms gen :: [Int]) xs
+
+
+-- Generate the combinations of K distinct objects chosen from the N elements of a list
+
+combinations:: Int -> [a] -> [[a]]
+combinations = undefined
