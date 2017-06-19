@@ -14,11 +14,13 @@ module Ex21to28
 import Control.Monad
 import Control.Applicative
 import Control.Arrow((&&&))
-import Data.List(tails, group, unfoldr,sortBy, sortOn)
-import Data.Maybe(listToMaybe)
+import Data.List(tails, group, unfoldr,sortBy, sortOn, concat, sort, find, groupBy)
+import Data.Maybe(listToMaybe, fromJust)
 import Data.List.Zipper
 import System.Random
 import Ex11to20(removeAt')
+import qualified Data.Map as Map
+import Data.Function(on)
 
 -- zippers ! yay
 insertAt':: Int -> a -> [a] -> [a]
@@ -60,6 +62,62 @@ randomPermutation xs = newStdGen >>= \gen ->
 
 
 -- Generate the combinations of K distinct objects chosen from the N elements of a list
-
+-- TODO: performance?
 combinations:: Int -> [a] -> [[a]]
-combinations = undefined
+combinations 0 xs = []
+combinations 1 xs = map (\x -> x:[]) xs
+combinations n (x:xs) = (map ((:)x) $ combinations (n - 1) xs) ++ combinations n xs
+
+
+-- Group the elements of a set into disjoint subsets.
+{-
+example:
+group [2,3,4] ["aldo","beat","carla","david","evi","flip","gary","hugo","ida"]
+[[["aldo","beat"],["carla","david","evi"],["flip","gary","hugo","ida"]],...]
+
+
+group [2,2,5] ["aldo","beat","carla","david","evi","flip","gary","hugo","ida"]
+[[["aldo","beat"],["carla","david"],["evi","flip","gary","hugo","ida"]],...]
+
+-}
+
+
+group' :: [Int] -> [a] -> [[[a]]]
+group' [] [] = []
+group' (n:[]) xs = [[xs]]
+group' gs xs =   foobar (\g rest ->
+                           map   (\bs ->
+                             (take g xs): bs
+                           ) (group' rest (drop g xs))
+               ) gs
+
+
+
+foobar :: (a -> [a] -> [b]) -> [a] -> [b]
+foobar f xs = concat $ foldrz (\z res -> f (cursor z) (toList $ delete z) : res) [] z0
+        where
+          z0 = fromList xs
+
+
+-- Problem 28
+-- Sorting a list of lists according to length of sublists
+lsort :: [[a]] -> [[a]]
+lsort = sortOn length
+
+{-
+Again, we suppose that a list contains elements that are lists themselves.
+But this time the objective is to sort the elements of this list according to
+their length frequency;
+i.e., in the default, where sorting is done ascendingly, lists with rare lengths
+are placed first, others with a more frequent length come later.
+-}
+-- TODO: sortBy , comparing, study
+lfsort :: [[a]] -> [[a]]
+lfsort xs = sortOn (\x ->  snd $ fromJust $ find (\y -> (fst y) == (length x)) freqs) xs
+    where
+      freqs =  map (\x -> (head x, length x)) $ group . sort $ (map length xs)
+
+
+
+lfsort' :: [[a]] -> [[a]]
+lfsort' = concat . lsort . groupBy ((==) `on` length) . lsort
