@@ -15,18 +15,21 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
+                     , src/kata
   exposed-modules:     Lib
                      , Luhn
                      , Ex11to20
                      , Ex21to28
                      , Ex31to41
                      , Continuations
+                     , Kata11SortingItOut
   build-depends:       base >= 4.7 && < 5
                      , mtl >= 2.2.1
                      , transformers
                      , ListZipper
                      , random
                      , containers
+                     , unordered-containers
   default-language:    Haskell2010
 
 executable ninety-nine-exe
