@@ -21,6 +21,7 @@ library
                      , Ex11to20
                      , Ex21to28
                      , Ex31to41
+                     , Ex46to50
                      , Continuations
                      , Kata11SortingItOut
   build-depends:       base >= 4.7 && < 5
@@ -30,6 +31,7 @@ library
                      , random
                      , containers
                      , unordered-containers
+                     , monad-loops
   default-language:    Haskell2010
 
 executable ninety-nine-exe
@@ -56,6 +58,7 @@ test-suite ninety-nine-test
                      , Ex11to20Spec
                      , Ex21to28Spec
                      , Ex31to41Spec
+                     , Ex46to50Spec
   default-language:    Haskell2010
 
 source-repository head

@@ -9,6 +9,7 @@ module Ex11to20
       , slice
       , rotate
       , removeAt'
+      , pack
       , MList(Single, Multiple)
 
     ) where
