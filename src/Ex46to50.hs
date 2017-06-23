@@ -8,7 +8,8 @@ module Ex46to50 (
    impl',
    equ',
    table,
-   tableN
+   tableN,
+   gray
 ) where
 
 import Control.Monad(forM, forM_)
@@ -87,3 +88,5 @@ tableN n f = forM_ ys printLine
 
 
 -- Problem 49 Gray Codes!
+gray:: Int -> [String]
+gray = undefined
