@@ -9,11 +9,13 @@ module Ex46to50 (
    equ',
    table,
    tableN,
-   gray
+   gray,
+   huffman
 ) where
 
 import Control.Monad(forM, forM_)
 import Control.Monad.Loops(unfoldrM)
+import qualified Data.PQueue.Prio.Min as PQ
 -- Logic and Codes
 
 -- Problem 46
@@ -88,5 +90,34 @@ tableN n f = forM_ ys printLine
 
 
 -- Problem 49 Gray Codes!
+-- TODO: understand how they are built https://en.wikipedia.org/wiki/Gray_code
 gray:: Int -> [String]
-gray = undefined
+gray 1 = ["0","1"]
+gray n = map ("0"++) xs ++ map ("1"++) (reverse xs)
+         where
+           xs = gray (n - 1)
+
+
+data Tree a = Nil | Node (Maybe a) (Tree a) (Tree a)
+
+-- Problem 50 Huffman codes
+-- TODO: state monad ?? create/analyze heaps?
+-- TODO: understand algorithm!!
+huffman :: [(Char,Int)] -> [(Char, String)]
+huffman xs = walkTree "" $ snd $ buildTree pq
+        where
+          pq = PQ.fromList $ map (\it -> (snd it, Node (Just (fst it)) Nil Nil) ) xs
+          buildTree pq | PQ.size pq == 1 = PQ.findMin pq
+                       | otherwise = let
+                                      ((pa, a), pq') = PQ.deleteFindMin pq
+                                      ((pb, b), pq'') = PQ.deleteFindMin pq'
+                                      pq''' = PQ.insert (pa+pb) (Node Nothing a b) pq''
+                                     in
+                                      buildTree pq'''
+          swap (a,b) = (b,a)
+          walkTree _ Nil = []
+          walkTree prefix (Node (Just a) Nil Nil) = [(a, reverse prefix)]
+          walkTree prefix (Node Nothing l r) = (walkTree ("0"++prefix) l) ++
+                                                (walkTree ("1"++prefix) r)
+--1) Build a Huffman Tree from input characters.
+-- 2) Traverse the Huffman Tree and assign codes to characters.
