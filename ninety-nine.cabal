@@ -23,6 +23,7 @@ library
                      , Ex31to41
                      , Ex46to50
                      , Ex54to60
+                     , Ex61to69
                      , Continuations
                      , Kata11SortingItOut
   build-depends:       base >= 4.7 && < 5
@@ -62,6 +63,7 @@ test-suite ninety-nine-test
                      , Ex31to41Spec
                      , Ex46to50Spec
                      , Ex54to60Spec
+                     , Ex61to69Spec
   default-language:    Haskell2010
 
 source-repository head
