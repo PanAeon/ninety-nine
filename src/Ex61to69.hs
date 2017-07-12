@@ -5,9 +5,9 @@ module Ex61to69 (
 
 import Data.List(group, sort, findIndex)
 import Data.Maybe(fromJust)
+import Ex54to60(prettyPrint, Tree(Empty, Branch))
 
-data Tree a = Empty | Branch a (Tree a) (Tree a)
-                deriving (Show, Eq, Ord, Functor)
+
 
 
 
@@ -77,8 +77,39 @@ We can assign an address number to each node in a complete binary tree by enumer
 the nodes in level-order, starting at the root with number 1.
 For every node X with address A the following property holds:
 The address of X's left and right successors are 2*A and 2*A+1, respectively,
- if they exist. This fact can be used to elegantly construct a complete binary tree structure. 
+ if they exist. This fact can be used to elegantly construct a complete binary tree structure.
 
 -}
-completeBinaryTree :: Int -> [Tree Char]
-completeBinaryTree = undefined
+
+minNodesSeq :: [Int]
+minNodesSeq = 0:1:zipWith ((+).(1+)) minNodesSeq (tail minNodesSeq)
+minNodes = (minNodesSeq !!)
+
+
+height' n = (length $ takeWhile (<=n) minNodesSeq ) - 1
+-- FIXME: completeBinaryTree 7
+completeBinaryTree :: Int -> Tree Char
+completeBinaryTree n = insertLeft full (height - 1) m
+                       where
+                         height = height' n
+                         full = fullTree (height - 1)
+                         m = n - ((2^(height - 1 - 1)+1)) -- maybe height is right but
+                         -- insert m nodes to the left       m is wrong
+
+insertLeft :: Tree Char -> Int -> Int -> Tree Char -- fuck backtrack
+insertLeft b h 0 = b
+insertLeft Empty _ _ = Branch 'x' Empty Empty
+insertLeft b 0 n = error $ ">> b: " ++ (show b) ++ ", n: " ++ show n
+insertLeft (Branch c l r) 1 1 = Branch 'x' (Branch 'x' Empty Empty) Empty
+insertLeft (Branch c l r) 1 2 = Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' Empty Empty)
+insertLeft (Branch c l r) h n = Branch c (insertLeft l (h-1) n1) (insertLeft r (h-1) n2)
+                                where
+                                  n1 = min n (2^(h-1))
+                                  n2 = max 0 (n - n1)
+
+fullTree :: Int -> Tree Char
+fullTree 0 = Empty
+fullTree h = Branch 'x' (fullTree (h - 1)) (fullTree (h - 1))
+
+isCompleteBinaryTree :: Tree Char -> Bool
+isCompleteBinaryTree = undefined

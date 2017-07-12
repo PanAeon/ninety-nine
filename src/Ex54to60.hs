@@ -1,6 +1,8 @@
 module Ex54to60 (
-    completelyBalancedTree
+    Tree(Empty, Branch)
+  , completelyBalancedTree
   , hbalTree
+  , prettyPrint
 ) where
 
 import Data.List(group, sort, findIndex)
