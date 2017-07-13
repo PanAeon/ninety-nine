@@ -81,20 +81,32 @@ The address of X's left and right successors are 2*A and 2*A+1, respectively,
 
 -}
 
-minNodesSeq :: [Int]
-minNodesSeq = 0:1:zipWith ((+).(1+)) minNodesSeq (tail minNodesSeq)
-minNodes = (minNodesSeq !!)
 
 
-height' n = (length $ takeWhile (<=n) minNodesSeq ) - 1
+height' :: Int -> Int
+height' n = ceiling $ (logBase 2 (fromIntegral (n+1)))
 -- FIXME: completeBinaryTree 7
 completeBinaryTree :: Int -> Tree Char
-completeBinaryTree n = insertLeft full (height - 1) m
+completeBinaryTree n = insertLeft' full m
                        where
                          height = height' n
                          full = fullTree (height - 1)
-                         m = n - ((2^(height - 1 - 1)+1)) -- maybe height is right but
+                         m = n - (2^(height - 1) - 1) -- maybe height is right but
                          -- insert m nodes to the left       m is wrong
+
+
+insertLeft' :: Tree Char -> Int -> Tree Char
+insertLeft' tree n = fst $ ins tree n
+            where
+              ins tree 0 = (tree, 0)
+              ins (Empty) n = error "shouldn't happen, right?"
+              ins (Branch x Empty Empty) 1 = ((Branch x (Branch 'x' Empty Empty) Empty), 0)
+              ins (Branch x Empty Empty) n = ((Branch x (Branch 'x' Empty Empty) (Branch 'x' Empty Empty)), n-2)
+              ins (Branch x left  right) n = let
+                                               (l', m) = ins left n
+                                               (r', m') = ins right m
+                                             in
+                                               ((Branch x l' r'), m')
 
 insertLeft :: Tree Char -> Int -> Int -> Tree Char -- fuck backtrack
 insertLeft b h 0 = b
@@ -112,4 +124,10 @@ fullTree 0 = Empty
 fullTree h = Branch 'x' (fullTree (h - 1)) (fullTree (h - 1))
 
 isCompleteBinaryTree :: Tree Char -> Bool
-isCompleteBinaryTree = undefined
+isCompleteBinaryTree tree = undefined
+                where
+                  leftMostLength = ll tree
+                  prevLength = leftMostLength - 1
+                  ll Empty = 0
+                  ll (Branch _ left right) = 1 + ll (left)
+                  
