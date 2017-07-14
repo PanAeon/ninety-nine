@@ -6,7 +6,7 @@ module Ex61to69 (
 import Data.List(group, sort, findIndex)
 import Data.Maybe(fromJust)
 import Ex54to60(prettyPrint, Tree(Empty, Branch))
-
+import qualified Data.Sequence as Seq
 
 
 
@@ -123,11 +123,36 @@ fullTree :: Int -> Tree Char
 fullTree 0 = Empty
 fullTree h = Branch 'x' (fullTree (h - 1)) (fullTree (h - 1))
 
+enqueue :: Seq.Seq a -> a -> Seq.Seq a
+enqueue = (Seq.|>)
+
+dequeue :: Seq.Seq a -> (Seq.Seq a, Maybe a)
+dequeue xs = if null xs then
+               (xs, Nothing)
+             else (Seq.drop 1 xs, Just $ xs `Seq.index` 0)
+
+deq :: Seq.Seq a -> (a, Queue a)
+deq xs = ( xs `Seq.index` 0, Seq.drop 1 xs)
+
+type Queue = Seq.Seq
+
 isCompleteBinaryTree :: Tree Char -> Bool
 isCompleteBinaryTree tree = undefined
-                where
-                  leftMostLength = ll tree
-                  prevLength = leftMostLength - 1
-                  ll Empty = 0
-                  ll (Branch _ left right) = 1 + ll (left)
-                  
+
+levelOrder :: Tree a -> Queue (Tree a) -> [a]
+levelOrder Empty q | Seq.null q = []
+                   | otherwise  = (uncurry levelOrder) $ deq q
+
+levelOrder (Branch x left right) q = x : ((uncurry levelOrder) $ deq q'')
+              where
+                q'  = enqueue q left
+                q'' = enqueue q' right
+
+-- good, now we only need level-order fold and level order unfold, with Empty/Branch as inputs
+
+              --   where
+              -- --    levelOrder Empty =
+              -- --    levelOrder (Branch x left right) =
+              --     inOrder Empty = ["e"]
+              --     inOrder (Branch _ Empty Empty) = ["l"]
+              --     inOrder (Branch )
