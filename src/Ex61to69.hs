@@ -6,6 +6,8 @@ module Ex61to69 (
 import Data.List(group, sort, findIndex)
 import Data.Maybe(fromJust)
 import Ex54to60(prettyPrint, Tree(Empty, Branch))
+import Data.Traversable(traverse)
+import qualified Data.Foldable as Fldbl
 import qualified Data.Sequence as Seq
 
 
@@ -82,6 +84,8 @@ The address of X's left and right successors are 2*A and 2*A+1, respectively,
 -}
 
 
+-- looks like indxd construction may be the fastest one , but ...
+-- cont? zipper?
 
 height' :: Int -> Int
 height' n = ceiling $ (logBase 2 (fromIntegral (n+1)))
@@ -123,10 +127,11 @@ fullTree :: Int -> Tree Char
 fullTree 0 = Empty
 fullTree h = Branch 'x' (fullTree (h - 1)) (fullTree (h - 1))
 
+-- ?? arrow?
 enqueue :: Seq.Seq a -> a -> Seq.Seq a
 enqueue = (Seq.|>)
 
-dequeue :: Seq.Seq a -> (Seq.Seq a, Maybe a)
+dequeue :: Seq.Seq a -> (Seq.Seq a, Maybe a) -- wrong signature Maybe (Seq a, a)
 dequeue xs = if null xs then
                (xs, Nothing)
              else (Seq.drop 1 xs, Just $ xs `Seq.index` 0)
@@ -135,19 +140,44 @@ deq :: Seq.Seq a -> (a, Queue a)
 deq xs = ( xs `Seq.index` 0, Seq.drop 1 xs)
 
 type Queue = Seq.Seq
+-- todo: isLeaf? NO?
+isCompleteBinaryTree :: Tree a -> Bool
+isCompleteBinaryTree tree = fst $ levelOrderTraversal f (True,"f") tree
+                            where
+                              f :: (Bool, String) -> (Tree a) -> (Bool, String)
+                              f (False, _) _ = (False, "e")
+                              f (_, "f") Empty = (True, "e")
+                              f (_, "l") Empty = (True, "e")
+                              f (_, "e") Empty = (True, "e")
+                              f (_, "f") (Branch _ (Branch _ _ _) (Branch _ _ _)) = (True, "f")
+                              f (_, "f") (Branch _ Empty (Branch _ _ _)) = (True, "l")
+                              f (_, "f") (Branch _ Empty Empty) = (True, "l")
+                              f (_, "f") (Branch _  (Branch _ _ _) Empty) = (True, "l")
+                              f (_, "l") (Branch _ Empty (Branch _ _ _)) = (True, "l")
+                              f (_, "l") (Branch _  (Branch _ _ _) Empty) = (True, "l")
+                              f (_, "l") (Branch _ Empty Empty) = (True, "l")
 
-isCompleteBinaryTree :: Tree Char -> Bool
-isCompleteBinaryTree tree = undefined
+                              f _ _ = (False, "e")
+                              isInternal (Branch _ (Branch _ _ _) (Branch _ _ _)) = True
+                              isInternal _ = False
+                              isBranch (Branch _ _ _ ) = True
+                              isBranch _ = False
 
-levelOrder :: Tree a -> Queue (Tree a) -> [a]
-levelOrder Empty q | Seq.null q = []
-                   | otherwise  = (uncurry levelOrder) $ deq q
 
-levelOrder (Branch x left right) q = x : ((uncurry levelOrder) $ deq q'')
+
+levelOrder :: (b -> (Tree a) -> b) -> b -> Tree a -> Queue (Tree a) -> b
+levelOrder f z Empty q | Seq.null q = f z Empty --
+                       | otherwise  = (uncurry $ levelOrder f (f z Empty)) $ deq q
+
+levelOrder f z b@(Branch x left right) q = ((uncurry $ levelOrder f (f z b)) $ deq q'')
               where
                 q'  = enqueue q left
                 q'' = enqueue q' right
 
+-- FIXME: Foldable intance for Tree, how to choose between different typeclasses?
+-- how to deal with leaves?
+levelOrderTraversal :: (b -> (Tree a) -> b) -> b -> (Tree a) -> b
+levelOrderTraversal f z tree = levelOrder f z tree Seq.empty
 -- good, now we only need level-order fold and level order unfold, with Empty/Branch as inputs
 
               --   where
@@ -156,3 +186,42 @@ levelOrder (Branch x left right) q = x : ((uncurry levelOrder) $ deq q'')
               --     inOrder Empty = ["e"]
               --     inOrder (Branch _ Empty Empty) = ["l"]
               --     inOrder (Branch )
+
+
+genTree :: Int -> Tree String
+genTree 0 = Empty
+genTree n = Branch (show n) (genTree (n-1)) (genTree (n - 1))
+
+collectLevelOrder :: (Show a) => Tree a -> String
+collectLevelOrder = levelOrderTraversal f ""
+        where
+          f s Empty = s ++ " e"
+          f s (Branch x _ _) = s ++ " " ++ (show x)
+
+
+data TBNode = TBNode (Maybe TBNode) Bool deriving(Show)
+
+-- queue should already have 1 node
+buildTBuilder' :: Int -> Queue TBNode -> [TBNode]
+buildTBuilder' 0 q = Fldbl.foldr (:) [] q
+buildTBuilder' n q = if n == 1 then
+                        buildTBuilder' 0 $ enqueue q' (TBNode (Just p) True)
+                     else
+                        buildTBuilder' (n - 2) q'''
+            where
+              (p, q') = deq q
+              q'' = enqueue q' (TBNode (Just p) True)
+              q''' = enqueue q'' (TBNode (Just p) False)
+
+
+convertToTree :: [TBNode] -> Tree Char
+convertToTree = undefined -- parent comparison without uuid is expensive!!
+
+
+cbt :: Int -> Tree Char
+cbt 0 = Empty
+cbt n = build 1
+  where
+    m = n + 1
+    build i | i < m     = Branch 'x' (build (i * 2)) (build (i * 2 + 1))
+            | otherwise = Empty
