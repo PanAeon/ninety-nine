@@ -240,3 +240,57 @@ layout1 tree = snd $  annotateX (annotateY tree 1) 0
                                            where
                                              (n,l') = annotateX l m
                                              (n', r') = annotateX r (n+1)
+
+
+-- Problem 65
+layout2 :: Tree a -> Tree (a, (Int, Int))
+layout2 tree = annotate tree xp 1 sep1
+    where
+      maxHeight Empty = 0
+      maxHeight (Branch _ l r) = 1 + max (maxHeight l) (maxHeight r)
+      treeHeight = maxHeight tree
+
+      leftDepth Empty = 0
+      leftDepth (Branch  _ l _) = 1 + leftDepth l
+
+      leftD = leftDepth tree
+
+      sep1 = 2 ^ (treeHeight - 2)
+
+      xp =  2^(treeHeight-1) - 2^(treeHeight-leftD) + 1
+
+      annotate :: Tree a -> Int -> Int -> Int -> Tree (a, (Int, Int))
+      annotate Empty x y sep = Empty
+
+      annotate (Branch a l r) x y sep =  Branch (a, (x, y)) l' r'
+                      where
+                        l' = annotate l (x - sep) (y + 1) (sep `div` 2)
+                        r' = annotate r (x + sep) (y + 1) (sep `div` 2)
+
+
+
+
+
+
+
+tree65 = Branch 'n'
+                (Branch 'k'
+                        (Branch 'c'
+                                (Branch 'a' Empty Empty)
+                                (Branch 'e'
+                                        (Branch 'd' Empty Empty)
+                                        (Branch 'g' Empty Empty)
+                                )
+                        )
+                        (Branch 'm' Empty Empty)
+                )
+                (Branch 'u'
+                        (Branch 'p'
+                                Empty
+                                (Branch 'q' Empty Empty)
+                        )
+                        Empty
+                )
+
+
+-- Problem 66
