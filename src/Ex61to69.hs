@@ -225,3 +225,6 @@ cbt n = build 1
     m = n + 1
     build i | i < m     = Branch 'x' (build (i * 2)) (build (i * 2 + 1))
             | otherwise = Empty
+
+
+-- fooh,  Problem 64
