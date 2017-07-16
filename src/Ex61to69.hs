@@ -228,3 +228,15 @@ cbt n = build 1
 
 
 -- fooh,  Problem 64
+-- TODO: could be done in single pass (easy)
+layout1 :: Tree a -> Tree (a, (Int, Int))
+layout1 tree = snd $  annotateX (annotateY tree 1) 0
+            where
+              annotateY Empty _ = Empty
+              annotateY (Branch x l r) n = Branch (x, n) (annotateY l (n +1)) (annotateY r (n +1))
+              annotateX :: Tree (a,Int) -> Int -> (Int, Tree (a, (Int, Int)))
+              annotateX Empty  m = (m, Empty)
+              annotateX (Branch (a,y) l r) m = (n', Branch (a, (n+1, y)) l' r')
+                                           where
+                                             (n,l') = annotateX l m
+                                             (n', r') = annotateX r (n+1)
