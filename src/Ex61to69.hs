@@ -294,3 +294,32 @@ tree65 = Branch 'n'
 
 
 -- Problem 66
+type Pos = (Int, Int)
+
+layout3 ::  Tree a -> Tree (a, Pos)
+layout3 = snd . build  1 1
+        where
+          build  shift y Empty = (shift, Empty)
+          build  shift y (Branch a l r) = undefined
+                 where
+                  (shift', l') = build shift (y+1) l
+                  -- let gap = 2
+
+                  -- while { shift'' = shift' + gap; (rightEdge shift'' r ) overlaps l'}
+                  --       { gap = gap * 2; }
+                  -- build (shift' + gap') r
+                  --
+                  -- return Parent(shif't + gap'/2 y)
+                  -- l' = build l   -- Set Pos
+                  -- while overlap
+                  -- increase parent gap * 2
+                  --
+                  --right-edge = leftEdge r parentPos
+                  --
+                  -- buildr r
+          -- FIXME: this is wrong, need *all left* nodes, note just left nodes
+          overlaps :: Tree (a, Pos) -> Tree (a, Pos) -> Bool
+          overlaps Empty _ = False
+          overlaps _ Empty = False
+          overlaps (Branch (_, (x1,_)) _ r') (Branch (_, (x2,_)) l' _) | x1 >= x2 = True
+                                                                       | otherwise = False
