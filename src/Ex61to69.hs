@@ -3,14 +3,15 @@ module Ex61to69 (
 
 ) where
 
-import Data.List(group, sort, findIndex)
+import Data.List(group, sort, findIndex, intersect)
 import Data.Maybe(fromJust)
 import Ex54to60(prettyPrint, Tree(Empty, Branch))
 import Data.Traversable(traverse)
 import qualified Data.Foldable as Fldbl
 import qualified Data.Sequence as Seq
-
-
+import qualified Control.Monad.State as St
+import Control.Monad.Loops(iterateWhile)
+import Control.Applicative(liftA)
 
 
 -- count leaves
@@ -295,31 +296,60 @@ tree65 = Branch 'n'
 
 -- Problem 66
 type Pos = (Int, Int)
-
+--------------- fuck, almost!! off by one error)
 layout3 ::  Tree a -> Tree (a, Pos)
-layout3 = snd . build  1 1
+layout3 = snd . build  0 1
         where
           build  shift y Empty = (shift, Empty)
-          build  shift y (Branch a l r) = undefined
+          build  shift y (Branch a l r) = (pShift, Branch (a, (pShift, y))  l' r')
                  where
                   (shift', l') = build shift (y+1) l
-                  -- let gap = 2
 
-                  -- while { shift'' = shift' + gap; (rightEdge shift'' r ) overlaps l'}
-                  --       { gap = gap * 2; }
-                  -- build (shift' + gap') r
-                  --
-                  -- return Parent(shif't + gap'/2 y)
-                  -- l' = build l   -- Set Pos
-                  -- while overlap
-                  -- increase parent gap * 2
-                  --
-                  --right-edge = leftEdge r parentPos
-                  --
-                  -- buildr r
-          -- FIXME: this is wrong, need *all left* nodes, note just left nodes
-          overlaps :: Tree (a, Pos) -> Tree (a, Pos) -> Bool
-          overlaps Empty _ = False
-          overlaps _ Empty = False
-          overlaps (Branch (_, (x1,_)) _ r') (Branch (_, (x2,_)) l' _) | x1 >= x2 = True
-                                                                       | otherwise = False
+                  rv = fmap (snd) $ rightView l'
+                  -- let gap = 2
+                  isOverlapping gap = not (null $ intersect lv rv)
+                              where
+                                shift''  = shift' + gap
+                                (_, r')  = build shift'' (y+1) r
+                                lv = fmap (snd) $ leftView r'
+                  doubleGap = fmap (*2) St.get -- (St.liftM (*2))
+                  theGap = St.evalState (iterateWhile isOverlapping doubleGap) 1
+
+                  (shift'', r') = build (shift' + theGap) (y+1) r
+                  pShift = shift' + (theGap `div` 2)
+
+
+
+stateEx :: (Int -> Bool) -> St.State Int Int
+stateEx cond = iterateWhile cond st
+             where
+               st = do
+                      gap <- St.get
+                      return $ gap * 2
+
+rightView :: Tree a ->  [a]
+rightView tree =  snd $ view tree 1 0
+          where
+            view Empty h maxH = (max maxH (h-1), [])
+            view b@(Branch x l r) h maxH =
+                if (h <= maxH) then
+                  (maxH'', r' ++ l')
+                else
+                  (maxH'', x : (r' ++ l'))
+              where
+                (maxH', r') = view r (h+1) maxH
+                (maxH'', l') = view l (h+1) (maxH')
+
+
+leftView :: Tree a ->  [a]
+leftView tree =  snd $ view tree 1 0
+          where
+            view Empty h maxH = (max maxH (h-1), [])
+            view b@(Branch x l r) h maxH =
+                if (h <= maxH) then
+                  (maxH'', r' ++ l')
+                else
+                  (maxH'', x : (r' ++ l'))
+              where
+                (maxH', r') = view l (h+1) maxH
+                (maxH'', l') = view r (h+1) (maxH')
