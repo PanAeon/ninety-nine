@@ -353,3 +353,23 @@ leftView tree =  snd $ view tree 1 0
               where
                 (maxH', r') = view l (h+1) maxH
                 (maxH'', l') = view r (h+1) (maxH')
+
+
+treeToString :: Tree Char -> String
+treeToString Empty = ""
+treeToString (Branch x Empty Empty) =  x:""
+treeToString (Branch x l r) = x:"(" ++ treeToString l ++ ","++ treeToString r ++ ")"
+
+
+stringToTree :: String -> Tree Char
+stringToTree "" = Empty
+stringToTree xs = undefined --Branch x l r
+             where
+               --(x:xs') = xs
+               --('(':xs') = xs'
+               --l = stringToTree xs'
+               -- ctxt???
+               -- parse ','
+               -- parseTree
+               -- parse ')'
+               -- return rest, branch
