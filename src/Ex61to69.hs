@@ -360,16 +360,106 @@ treeToString Empty = ""
 treeToString (Branch x Empty Empty) =  x:""
 treeToString (Branch x l r) = x:"(" ++ treeToString l ++ ","++ treeToString r ++ ")"
 
+-- FIXME: some standard efficient tokenizer
+--tokenize :: String -> [Char]
+--tokenize "" = []
+--tokenize xs = tok xs ""
+--              where
+--                rezerved = ['(', ',', ')']
+--                tok :: String -> [Char]
+--                tok [] [] = []
+--                tok [] prev = [prev]
+--                tok (x:xs) prev | null prev && elem x rezerved = [[x]] ++ (tok xs "")
+--                                | elem x rezerved              = prev : [[x]] ++ (tok xs "")
+--                                | otherwise                    = tok xs (prev ++ [x])
+--
+--
 
+
+
+-- FIXME: rewrite this shame
 stringToTree :: String -> Tree Char
 stringToTree "" = Empty
-stringToTree xs = undefined --Branch x l r
+stringToTree xs = fst $ expectNode xs
              where
-               --(x:xs') = xs
-               --('(':xs') = xs'
-               --l = stringToTree xs'
-               -- ctxt???
-               -- parse ','
-               -- parseTree
-               -- parse ')'
-               -- return rest, branch
+               expectNode :: String -> (Tree Char, String)
+               expectNode (',':xs) = (Empty, ',':xs)
+               expectNode (')':xs) = (Empty, ')':xs)
+               expectNode (x: ',':xs) = (Branch x Empty Empty, xs)
+               expectNode (x: ')':xs) = (Branch x Empty Empty, xs)
+               expectNode (x:'(':xs) = ((Branch x l r), xs'''')
+                                       where
+                                         (l,xs') = expectNode xs
+                                         (r, xs''') = expectNode xs'
+                                         xs'''' = drop 1 xs'''
+
+               expectNode other  = error other
+               --expectNode (x:xs)     = ((Branch x Empty Empty), xs)
+
+
+
+-- 0 parent 1 left 2 right
+-- dir, level
+levelOrder' :: (b -> (a, (Int, Int)) -> b) -> b -> (Tree a, (Int, Int)) -> Queue (Tree a, (Int, Int)) -> b
+levelOrder' f z (Empty, (_, _)) q  | Seq.null q = z
+                       | otherwise  =  uncurry (levelOrder' f z) (deq q)
+
+levelOrder' f z ((Branch x left right), (dir, height)) q = ((uncurry $ levelOrder' f (f z (x,(dir, height)))) $ deq q'')
+              where
+                q'  = enqueue q (left, (1, height + 1))
+                q'' = enqueue q' (right, (2, height + 1))
+
+-- FIXME: Foldable intance for Tree, how to choose between different typeclasses?
+-- how to deal with leaves?
+levelOrderTraversal' :: (b -> (a, (Int, Int)) -> b) -> b -> (Tree a) -> b
+levelOrderTraversal' f z tree = levelOrder' f z (tree,(0,1)) Seq.empty
+
+printTree :: Tree (Char, Pos) -> IO ()
+printTree =  thrd . levelOrderTraversal' printNode (1, 0, return ())
+            where
+              thrd (_, _, x) = x
+              printNode (currL, currP, io) ((ch, (x,y)), (dir,y')) = (y', x*2, printN)
+                where
+
+                  (currP', nl) = if (y' > currL) then
+                                  (0, putStrLn "")
+                                 else
+                                   (currP, return ())
+                  padding = concat $ replicate (x*2-1 - currP') " "
+                  printN =  do
+                             io
+                             nl
+                             putStr padding
+                             putStr [ch]
+
+
+-----------------
+{-
+Problem 68
+
+Preorder and inorder sequences of binary trees.
+We consider binary trees with nodes that are identified by single
+ lower-case letters, as in the example of problem P67.
+
+a) Write predicates preorder/2 and inorder/2 that construct
+the preorder and inorder sequence of a given binary tree, respectively.
+The results should be atoms, e.g. 'abdecfg' for the preorder sequence of
+ the example in problem P67.
+
+b) Can you use preorder/2 from problem part a) in the reverse direction;
+i.e. given a preorder sequence, construct a corresponding tree?
+If not, make the necessary arrangements.
+
+c) If both the preorder sequence and the inorder sequence of
+the nodes of a binary tree are given, then the tree is determined unambiguously.
+Write a predicate pre_in_tree/3 that does the job.
+
+Example in Haskell:
+
+Main> let { Just t = stringToTree "a(b(d,e),c(,f(g,)))" ;
+            po = treeToPreorder t ;
+            io = treeToInorder t } in preInTree po io >>= print
+Branch 'a' (Branch 'b' (Branch 'd' Empty Empty) (Branch 'e' Empty Empty)) (Branch 'c' Empty (Branch 'f' (Branch
+
+
+-}
