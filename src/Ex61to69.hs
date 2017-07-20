@@ -383,7 +383,7 @@ stringToTree "" = Empty
 stringToTree xs = fst $ expectNode xs
              where
                expectNode :: String -> (Tree Char, String)
-               expectNode (',':xs) = (Empty, ',':xs)
+               expectNode (',':xs) = (Empty, xs)
                expectNode (')':xs) = (Empty, ')':xs)
                expectNode (x: ',':xs) = (Branch x Empty Empty, xs)
                expectNode (x: ')':xs) = (Branch x Empty Empty, xs)
@@ -463,3 +463,20 @@ Branch 'a' (Branch 'b' (Branch 'd' Empty Empty) (Branch 'e' Empty Empty)) (Branc
 
 
 -}
+
+inorder :: Tree a -> [a]
+inorder Empty = []
+inorder (Branch x l r) = preorder l ++ [x] ++ (preorder r)
+
+preorder :: Tree a -> [a]
+preorder Empty = []
+preorder (Branch x l r) = x: (preorder l ++ preorder r)
+
+
+-- https://www.timeanddate.com/countdown/launch?iso=20170804T12&p0=1440&msg=ICFPC+2017&font=slab&csz=1#
+-- TODO: actually Eq might not be necessary?
+reconstruct :: (Eq a) => [a] -> [a] -> Tree a
+reconstruct (x:xs) (y:ys) | x == y = Branch x Empty Empty
+        --          where
+        --            idx a = fromJust $ findIndex a ys
+        --            isParent a b = (idx a) > (idx b)
