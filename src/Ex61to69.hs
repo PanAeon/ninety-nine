@@ -466,7 +466,7 @@ Branch 'a' (Branch 'b' (Branch 'd' Empty Empty) (Branch 'e' Empty Empty)) (Branc
 
 inorder :: Tree a -> [a]
 inorder Empty = []
-inorder (Branch x l r) = preorder l ++ [x] ++ (preorder r)
+inorder (Branch x l r) = inorder l ++ [x] ++ (inorder r)
 
 preorder :: Tree a -> [a]
 preorder Empty = []
@@ -492,3 +492,26 @@ reconstruct (x:xs) in' = Branch x l r
                          l = reconstruct xs l'
                          xs' = drop (length l') xs
                          r = reconstruct xs' r'
+
+
+-- Problem 69 Dotstring representation of binary trees.
+
+
+-- FIXME: actually USE difference lists
+toDotTree :: Tree Char -> String
+toDotTree Empty = "."
+toDotTree (Branch x l r) = x : toDotTree l ++ toDotTree r
+
+toDotTree' :: Tree Char -> ShowS
+toDotTree' Empty = shows "."
+toDotTree' (Branch x l r) = shows x . (toDotTree' l) . (toDotTree' r)
+
+
+fromDotTree :: String -> Tree Char
+fromDotTree = fst . fromDotTree'
+fromDotTree' [] = (Empty, [])
+fromDotTree' ('.':xs) = (Empty, xs)
+fromDotTree' (x : xs) = (Branch x l r, xs'')
+                where
+                  (l, xs') = fromDotTree' xs
+                  (r, xs'') = fromDotTree' xs'
