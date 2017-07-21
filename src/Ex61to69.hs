@@ -475,8 +475,20 @@ preorder (Branch x l r) = x: (preorder l ++ preorder r)
 
 -- https://www.timeanddate.com/countdown/launch?iso=20170804T12&p0=1440&msg=ICFPC+2017&font=slab&csz=1#
 -- TODO: actually Eq might not be necessary?
-reconstruct :: (Eq a) => [a] -> [a] -> Tree a
-reconstruct (x:xs) (y:ys) | x == y = Branch x Empty Empty
-        --          where
-        --            idx a = fromJust $ findIndex a ys
-        --            isParent a b = (idx a) > (idx b)
+
+-- well, we have:
+--            inorder    l :: [p] :: r
+--            preorder   p :  l :: r
+--     so we can get parent from postorder,
+--     left will be on the left in inorder, right on the right,
+--     fuck, that's amazing, no rly.
+-- looks correct, what's wrong with bloody tree :)?
+reconstruct :: (Show a, Eq a) => [a] -> [a] -> Tree a
+reconstruct ys     []  = Empty
+reconstruct []     in' = Empty
+reconstruct (x:xs) in' = Branch x l r
+                       where
+                         (l',(p:r')) = span (/=x) in' -- a bit wrong somewhere, but solid!
+                         l = reconstruct xs l'
+                         xs' = drop (length l') xs
+                         r = reconstruct xs' r'
