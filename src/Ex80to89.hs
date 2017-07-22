@@ -2,7 +2,8 @@ module Ex70to73 (
 
 ) where
 
-import Data.List(group, sort, findIndex, intersect, unfoldr, intersperse, nubBy, nub)
+import Data.List(group, sort, findIndex, intersect, unfoldr, intersperse, nubBy, nub,
+                    (\\))
 import Data.Maybe(fromJust, isJust)
 import Data.Traversable(traverse)
 import qualified Data.Foldable as Fldbl
@@ -59,3 +60,24 @@ friToAdj = graphToAdj . friToGraph
 
 --  Problem 81
 --  Path from one node to another one
+--  returns all the acyclic paths from a to b.
+
+-- undirected paths, but I believe that's fine
+paths :: (Eq a) => a -> a -> Adjacency a -> [[a]]
+paths a b  (Adj adj) = paths' a [a]
+    where
+      getAdj x = fromJust $ lookup  x adj
+      paths' x visited = if x == b then
+                            [[x]]
+                         else
+                            fmap (x:) $ concatMap (\y -> paths' y (x:visited)) (getAdj x \\ visited)
+
+
+--  Problem 82
+
+-- Cycle from a given node
+
+{- Write a predicate cycle(G,A,P) to find a closed path (cycle)
+   P starting at a given node A in the graph G.
+   The predicate should return all cycles via backtracking.
+-}
