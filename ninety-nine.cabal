@@ -24,6 +24,8 @@ library
                      , Ex46to50
                      , Ex54to60
                      , Ex61to69
+                     , Ex70to73
+                     , Ex80to89
                      , Continuations
                      , Kata11SortingItOut
   build-depends:       base >= 4.7 && < 5
