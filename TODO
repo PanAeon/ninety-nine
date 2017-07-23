@@ -1,0 +1,76 @@
+
+
+USE pomodoro
+
+
+
+http://dev.stephendiehl.com/hask/#scala
+
+-- inspect Stack code
+
+import/export from text file
+A*
+q-learing
+simulated annealing
+neural network
+minimax, negamax
+n-queens (logic monad)
+cards, chess (board)
+rover
+opengl,
+logMonad, trace,
+debug,
+randomMonad,
+(how to interactively inspect state?)
+json parser (aeson, in principle we have it)
+cmd line parser (in principle we have it, but try plain input, same as file)
+https://hackage.haskell.org/package/optparse-applicative#quick-start
+conduit
+test-framework, https://github.com/hspec/hspec-expectations
+bfs,dfs,
+stateM,
+monad transformer,
+IO,
+text parser, trifecta
+OverloadedStrings
+UnicodeSyntax
+
+
+Circular programming (Arrows)
+
+https://hackage.haskell.org/package/pathtype
+
+Data.Sequence, Data.Traversable, Data.Foldable
+Data.Vector
+
+Control.Arrow, Control.MonadPlus
+
+Control.Monad.Extra
+
+https://wiki.haskell.org/Foldr_Foldl_Foldl%27
+
+Default imports (Prelude):
+http://hackage.haskell.org/package/protolude
+http://hackage.haskell.org/package/base-4.9.1.0/docs/src/GHC.Base.html#many
+
+
+
+
+some coding chellnges (top 10 algorithm ??)
+
+JSON example:
+http://blog.raynes.me/blog/2012/11/27/easy-json-parsing-in-haskell-with-aeson/
+https://artyom.me/aeson Aeson the tutorial
+
+
+***
+for later:
+color output:
+https://hackage.haskell.org/package/ansi-wl-pprint-0.6.7.3/docs/Text-PrettyPrint-ANSI-Leijen.html
+
+easyjson, parsers https://hackage.haskell.org/package/parsers
+call-stack (get line number for example):: https://hackage.haskell.org/package/call-stack
+
+stack-run
+https://github.com/commercialhaskell/stack/issues/3233
+https://github.com/NixOS/nixpkgs/issues/15995
