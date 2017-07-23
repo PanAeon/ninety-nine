@@ -3,7 +3,7 @@ module Ex70to73 (
 ) where
 
 import Data.List(group, sort, findIndex, intersect, unfoldr, intersperse, nubBy, nub,
-                    (\\))
+                    (\\), delete, inits, tails)
 import Data.Maybe(fromJust, isJust)
 import Data.Traversable(traverse)
 import qualified Data.Foldable as Fldbl
@@ -81,3 +81,53 @@ paths a b  (Adj adj) = paths' a [a]
    P starting at a given node A in the graph G.
    The predicate should return all cycles via backtracking.
 -}
+
+cycle' :: (Eq a) => a -> Adjacency a -> [[a]]
+cycle' a (Adj adj) = cycle'' a []
+      where
+        getAdj x = fromJust $ lookup x adj
+        cycle'' x visited = fmap (x:) $ concatMap (\y -> cycle''' y foo) (getAdj x \\ visited)
+                            where
+                              foo = if x == a then visited else x:visited
+        cycle''' x visited = if x == a then
+                               [[a]]
+                             else
+                               cycle'' x visited
+--Problem 83
+
+--(**) Construct all spanning trees
+
+{-
+Write a predicate s_tree(Graph,Tree) to construct (by backtracking) all spanning trees
+of a given graph. With this predicate, find out how many spanning trees there are for
+the graph depicted to the left. The data of this example graph can be found in the file
+p83.dat. When you have a correct solution for the s_tree/2 predicate,
+use it to define two other useful predicates: is_tree(Graph) and is_connected(Graph).
+Both are five-minutes tasks!
+-}
+
+-- I don't know much about matrix bloody singularity and shit
+-- so will construct the graph as a dork
+-- TODO: this could be optimized, with at least checking connectedness smarter,
+-- with dfs and shit
+-- FIXME: should return graph itself if it is it's  own  spanning tree
+bfSpanningTree :: (Eq a) => Graph a -> [Graph a]
+bfSpanningTree = spanning
+   where
+     spanning g@(Graph nodes edges) = if null current then maybeg else current >>= spanning
+        where
+          current = filter isConnected $ map (\es -> Graph nodes es) (allButOne edges)
+          maybeg = if isConnected g then [g] else []
+     allButOne xs = if null xs then
+                    []
+                 else
+                   init $ map (uncurry (++)) $ zip (inits xs) (map (drop 1) $ tails xs)
+     rmEdge x (Graph nodes edges) =  Graph nodes (delete x edges)
+     isConnected g@(Graph nodes edges) = all (canConnectToOther g) nodes
+     canConnectToOther g@((Graph nodes _)) x = all (\y -> areConnected x y g) (delete x nodes)
+     areConnected a b g = not $ null $ paths a b (graphToAdj g)
+
+isTree :: (Eq a) => Graph a -> Bool
+isTree g = (length st == 1) && (head st == g)
+      where
+        st = bfSpanningTree g
