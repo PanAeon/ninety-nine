@@ -3,7 +3,7 @@ module Ex70to73 (
 ) where
 
 import Data.List(group, sort, findIndex, intersect, unfoldr, intersperse, nubBy, nub,
-                    (\\), delete, inits, tails)
+                    (\\), delete, inits, tails, sortBy, sortOn)
 import Data.Maybe(fromJust, isJust)
 import Data.Traversable(traverse)
 import qualified Data.Foldable as Fldbl
@@ -13,13 +13,15 @@ import Control.Monad.Loops(iterateWhile, unfoldM)
 import Control.Applicative(liftA, Alternative, many)
 import Control.Monad(ap, MonadPlus, mplus)
 import qualified Control.Applicative as App
-
+import qualified Data.Map as Map
 
 data Graph a = Graph [a] [(a,a)] deriving (Show, Eq)
 
 data Adjacency a = Adj [(a, [a])] deriving (Show, Eq)
 
 data Friendly a = Edge [(a, a)] deriving (Show, Eq)
+
+data WeightedGraph a = WeightedGraph [a] [(a,a, Int)] deriving (Show, Eq)
 
 --  Problem 80
 graphToAdj :: (Eq a) => Graph a -> Adjacency a
@@ -131,3 +133,28 @@ isTree :: (Eq a) => Graph a -> Bool
 isTree g = (length st == 1) && (head st == g)
       where
         st = bfSpanningTree g
+
+maxInt = 100000
+fst' (a,b,c) = a
+snd' (a,b,c) = b
+thrd (a,b,c) = c
+
+headOption [] = Nothing
+headOption (x:_) = Just x
+-- data WeightedGraph a = WeightedGraph [a] [(a,a, Int)] deriving (Show, Eq)
+minimumSpanningTree:: (Eq a) => WeightedGraph a  -> WeightedGraph a
+minimumSpanningTree g@(WeightedGraph nodes  edges) = spanning [] (map (\x -> (x, maxInt)) nodes) edges
+      where
+        spanning xs [] edges = WeightedGraph (map fst xs) edges
+        spanning processed ((x,wx):xs) edges = spanning ((x,wx):processed) xs'' prunedEdges
+          where
+            edges' = map (putFirst x) $ filter (connected x) edges
+            connected x (a,b,c) = x == a || x == b
+            putFirst x (a,b,c) = if x == a then (a,b,c) else (b,a,c)
+            xs' = map updateWeights xs
+            updateWeights (a,w) = if (ew < w) then (a,ew) else (a,w)
+              where
+                (_, _, ew) = maybe (undefined, undefined, maxInt) id $  headOption $ filter (\y -> snd' y == a) edges'
+            xs'' = sortOn snd xs'
+            prunedEdges = (take 1 $ sortOn thrd edges') ++ (filter (not . connectedWithP x) edges)
+            connectedWithP x (a,b,c)= any (\y -> (fst y == a || fst y == b) && (x == a || x == b)) (processed)
