@@ -1,4 +1,4 @@
-module Ex70to73 (
+module Ex80to89 (
 
 ) where
 
@@ -14,6 +14,7 @@ import Control.Applicative(liftA, Alternative, many)
 import Control.Monad(ap, MonadPlus, mplus)
 import qualified Control.Applicative as App
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 
 data Graph a = Graph [a] [(a,a)] deriving (Show, Eq)
 
@@ -158,3 +159,70 @@ minimumSpanningTree g@(WeightedGraph nodes  edges) = spanning [] (map (\x -> (x,
             xs'' = sortOn snd xs'
             prunedEdges = (take 1 $ sortOn thrd edges') ++ (filter (not . connectedWithP x) edges)
             connectedWithP x (a,b,c)= any (\y -> (fst y == a || fst y == b) && (x == a || x == b)) (processed)
+
+
+-- Problem 85
+
+-- (**) Graph isomorphism
+
+
+equal' :: (Ord a, Eq a) => Graph a -> Graph a -> Bool
+equal' (Graph n1 e1) (Graph n2 e2) = all (areAdjacent e1 e2) n1
+
+areAdjacent e1 e2 x = getAdjacentNodes x e1 == getAdjacentNodes x e2
+getAdjacentNodes x edges =  Set.fromList $ edges >>= (adjacentTo x)
+adjacentTo x (a,b) = if x == a then [b] else if x == b then [a] else []
+isAdjacentTo x (a,b) = x == a || x == b
+
+
+
+-- FIXME: blah
+--- TODO: if unconnected node gets picked up first then remove
+--- one unconnected node from g1 and proceed
+iso' :: (Ord a, Eq a) => Graph a -> Graph a -> Bool
+iso' (Graph (n1) e1) (Graph (pivot:n2) e2) = if length elligible == 0 then False else res
+  where
+    getNEdges x es = length $ getAdjacentNodes x es
+    pivotNEdges = getNEdges pivot e2
+    elligible = filter (\n -> getNEdges n e1 == pivotNEdges) n1
+    padj = getAdjacentNodes pivot
+    res = any (\x -> areIsomorphic [x]) elligible
+    areIsomorphic [] = True -- check, this should be queue, not stack
+    areIsomorphic queue = undefined
+
+
+-- Problem 86
+-- Color graph
+
+nodeDegree :: (Eq a) => Graph a -> a -> Int
+nodeDegree (Graph _ es) x = sum . ( map cnt ) . (concatMap (adjacentTo x)) . (filter (isAdjacentTo x)) $ es
+   where
+     cnt y | x == y    = 2
+           | otherwise = 1
+
+sortByDegreeDesc :: (Eq a) => Graph a -> [a]
+sortByDegreeDesc g@(Graph xs es) = map fst $ sortOn (\x -> (-1)* (snd x)) $ zip xs $ map (nodeDegree g) xs
+
+
+
+{-
+Graph ['a','b','c','d','e','f','g','h','i','j'] [('a','b'),('a','e'),('a','f'),('b','c'),('b','g'),('c','d'),('c','h'),('d','e'),('d','i'),('e','j'),('f','h'),('f','i'),('g','i'),('g','j'),('h','j')]
+-}
+colorGraph :: (Eq a, Ord a) => Graph a -> [(a, Int)]
+colorGraph g@(Graph vs es) = color [1..] Map.empty v
+       where
+         v = sortByDegreeDesc g
+         color _ _ [] = []
+         color (c:cs) m (x:xs) = if Map.notMember x m then
+                                   (x, c) : (color cs m'' xs) -- color all nodes (which are not colored) with c which do not collide
+                                 else
+                                   (x, fromJust $ Map.lookup x m) :  (color (c:cs) m xs)
+           where
+             isNothing Nothing = True
+             isNothing _       = False
+             m' = Map.insert x c m
+             m'' = foldl colorIfPossible m' xs
+             colorIfPossible m a = if  (isNothing $ Map.lookup a m) && isItPossible m a then Map.insert a c m else m
+             isItPossible m a = all (\x -> (maybe 0 id $ Map.lookup x m)  /= c)  (getAdjacentNodes' a)
+             getAdjacentNodes' x  =  Set.fromList $ es >>= (adjacentTo x)
+             adjacentTo' x (a,b) = if x == a then [b] else if x == b then [a] else []
