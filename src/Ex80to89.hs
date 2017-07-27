@@ -170,6 +170,7 @@ equal' :: (Ord a, Eq a) => Graph a -> Graph a -> Bool
 equal' (Graph n1 e1) (Graph n2 e2) = all (areAdjacent e1 e2) n1
 
 areAdjacent e1 e2 x = getAdjacentNodes x e1 == getAdjacentNodes x e2
+getAdjacentNodes :: (Ord a, Eq a) => a -> [(a,a)] -> Set.Set a
 getAdjacentNodes x edges =  Set.fromList $ edges >>= (adjacentTo x)
 adjacentTo x (a,b) = if x == a then [b] else if x == b then [a] else []
 isAdjacentTo x (a,b) = x == a || x == b
@@ -226,3 +227,15 @@ colorGraph g@(Graph vs es) = color [1..] Map.empty v
              isItPossible m a = all (\x -> (maybe 0 id $ Map.lookup x m)  /= c)  (getAdjacentNodes' a)
              getAdjacentNodes' x  =  Set.fromList $ es >>= (adjacentTo x)
              adjacentTo' x (a,b) = if x == a then [b] else if x == b then [a] else []
+
+
+-- Problem 87
+-- Depth-first order graph traversal (alternative solution)
+--- FFFFFFFFFFFFFFFFFFFffffffffuuckkk, need explicit stack
+depthfirst :: (Ord a, Eq a) => Graph a -> a -> [a]
+depthfirst g x = depth g x Set.empty
+    where
+      depth::(Ord a, Eq a) => Graph a -> a -> Set.Set a -> [a]
+      depth g@(Graph vertices edges) x processed = x : concatMap (\y -> depth g y (Set.insert y processed))adj
+          where
+            adj = Set.toList $ Set.filter ((flip Set.notMember) processed)  (getAdjacentNodes x edges)
