@@ -175,6 +175,9 @@ getAdjacentNodes x edges =  Set.fromList $ edges >>= (adjacentTo x)
 adjacentTo x (a,b) = if x == a then [b] else if x == b then [a] else []
 isAdjacentTo x (a,b) = x == a || x == b
 
+getAdjacentNodesInOrder :: (Ord a, Eq a) => a -> [(a,a)] ->  [a]
+getAdjacentNodesInOrder x edges =  edges >>= (adjacentTo x)
+
 
 
 -- FIXME: blah
@@ -231,11 +234,24 @@ colorGraph g@(Graph vs es) = color [1..] Map.empty v
 
 -- Problem 87
 -- Depth-first order graph traversal (alternative solution)
---- FFFFFFFFFFFFFFFFFFFffffffffuuckkk, need explicit stack
+
 depthfirst :: (Ord a, Eq a) => Graph a -> a -> [a]
-depthfirst g x = depth g x Set.empty
+depthfirst (Graph vertices edges) x = depth [x] Set.empty
     where
-      depth::(Ord a, Eq a) => Graph a -> a -> Set.Set a -> [a]
-      depth g@(Graph vertices edges) x processed = x : concatMap (\y -> depth g y (Set.insert y processed))adj
+    --  depth::(Ord a, Eq a) =>  [a] -> Set.Set a -> [a]
+      depth [] _ = []
+      depth (x:xs) processed = x' ++ (depth xs' (Set.insert x processed))
           where
-            adj = Set.toList $ Set.filter ((flip Set.notMember) processed)  (getAdjacentNodes x edges)
+            x' = if (Set.member x processed) then [] else [x]
+            xs' = (filter ((flip Set.notMember) processed)  (getAdjacentNodesInOrder x edges)) ++ xs
+
+
+-- Problem 88
+-- 10 Problem 88
+
+-- (**) Connected components (alternative solution)
+
+-- Write a predicate that splits a graph into its connected components.
+
+connectedComponents :: (Eq a, Ord a) => Graph a -> [Set.Set a]
+connectedComponents = undefined
