@@ -275,6 +275,7 @@ graphH1 = Graph [1,2,3,4,5,6,7,8] [(1,2),(1,4),(1,5),(6,2),(6,5),(6,7),(8,4),(8,
 graphH1' = Graph [1,2,3,4,5,6,7,8] [(1,2),(1,4),(1,5),(6,5),(6,7),(8,4),(8,5),(8,7),(3,2),(3,4),(3,7)]
 
 -- FIXME: this is hard achieved victory, test it well
+-- looks like adjacency list is better suitable for this job
 -- TODO: Use list as monad here, should simplify a bit
 -- I expect connected graph
 iso :: (Ord a, Eq a) => Graph a -> Graph a -> Bool
