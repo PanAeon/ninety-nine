@@ -3,7 +3,7 @@ module Ex80to89 (
 ) where
 
 import Data.List(group, sort, findIndex, intersect, unfoldr, intersperse, nubBy, nub,
-                    (\\), delete, inits, tails, sortBy, sortOn)
+                    (\\), delete, inits, tails, sortBy, sortOn, permutations)
 import Data.Maybe(fromJust, isJust)
 import Data.Traversable(traverse)
 import qualified Data.Foldable as Fldbl
@@ -13,7 +13,7 @@ import Control.Monad.Loops(iterateWhile, unfoldM)
 import Control.Applicative(liftA, Alternative, many)
 import Control.Monad(ap, MonadPlus, mplus)
 import qualified Control.Applicative as App
-import qualified Data.Map as Map
+import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 
 data Graph a = Graph [a] [(a,a)] deriving (Show, Eq)
@@ -179,20 +179,9 @@ getAdjacentNodesInOrder :: (Ord a, Eq a) => a -> [(a,a)] ->  [a]
 getAdjacentNodesInOrder x edges =  edges >>= (adjacentTo x)
 
 
+-- at the back
 
--- FIXME: blah
---- TODO: if unconnected node gets picked up first then remove
---- one unconnected node from g1 and proceed
-iso' :: (Ord a, Eq a) => Graph a -> Graph a -> Bool
-iso' (Graph (n1) e1) (Graph (pivot:n2) e2) = if length elligible == 0 then False else res
-  where
-    getNEdges x es = length $ getAdjacentNodes x es
-    pivotNEdges = getNEdges pivot e2
-    elligible = filter (\n -> getNEdges n e1 == pivotNEdges) n1
-    padj = getAdjacentNodes pivot
-    res = any (\x -> areIsomorphic [x]) elligible
-    areIsomorphic [] = True -- check, this should be queue, not stack
-    areIsomorphic queue = undefined
+
 
 
 -- Problem 86
@@ -277,3 +266,60 @@ bipartite g@(Graph vs edges) = bip' [(head vs, 'u')] Set.empty Set.empty
        bip' ((x, 'v'):xs) u v | Set.member x v = bip' xs u v
                               | Set.member x u = False
                               | otherwise = bip' (adjToU x ++ xs) u (Set.insert x v)
+
+
+----------------------- ISO -------------------------------------------------
+
+graphG1 = Graph [1,2,3,4,5,6,7,8] [(1,5),(1,6),(1,7),(2,5),(2,6),(2,8),(3,5),(3,7),(3,8),(4,6),(4,7),(4,8)]
+graphH1 = Graph [1,2,3,4,5,6,7,8] [(1,2),(1,4),(1,5),(6,2),(6,5),(6,7),(8,4),(8,5),(8,7),(3,2),(3,4),(3,7)]
+graphH1' = Graph [1,2,3,4,5,6,7,8] [(1,2),(1,4),(1,5),(6,5),(6,7),(8,4),(8,5),(8,7),(3,2),(3,4),(3,7)]
+
+-- FIXME: this is hard achieved victory, test it well
+-- TODO: Use list as monad here, should simplify a bit
+-- I expect connected graph
+iso :: (Ord a, Eq a) => Graph a -> Graph a -> Bool
+iso ga@(Graph (va) ea) gb@(Graph (pivot:n2) eb) = any areIso' zs
+  where
+    labels0 = [2..]
+    areIso [] _ _ _ _ = True
+    areIso ((xa, xb):xs) labelsA labelsB nextLabels processedB = (getNEdgesA xa == getNEdgesB xb) &&
+                                                                 (getLabel xa labelsA == getLabel xb labelsB) &&
+                                                                 (Set.member xb processedB ||
+                                                                 tailIsIsomorphic)
+      where
+        adjA = getAdjA xa
+        adjB = getAdjB xb
+        (labelsB', nextLabels') = labelNodes adjB labelsB nextLabels
+        processedB' = Set.insert xb processedB
+        foo = permutations adjA
+        bar = fmap (\ys -> (ys, fst $ labelNodes ys labelsA nextLabels)) foo
+        areIso'' (ys, labelsA') = areIso xs' labelsA' labelsB' nextLabels' processedB'
+          where
+            xs' = (zip ys adjB) ++ xs
+        tailIsIsomorphic = any areIso'' bar
+        -- now we have a list of labels for A ..., yeah, need to use []
+      --  (labelsA', _) = labelNodes adjA
+
+    getNEdgesA x = length $ getAdjacentNodes x ea
+    getNEdgesB x = length $ getAdjacentNodes x eb
+    getAdjA x = getAdjacentNodesInOrder x ea
+    getAdjB x = getAdjacentNodesInOrder x eb
+    getLabel x labels = fromJust $ Map.lookup x labels
+    pivotNEdges = getNEdgesB pivot
+    elligible = filter (\x -> getNEdgesA x  == pivotNEdges) va -- could have put whole graph instead, first step is to check
+    ques0 = fmap (\x -> [(x, pivot)]) elligible
+    labelssA0 =  fmap (\x -> Map.fromList [(x,1)]) elligible
+    labelssB0 = replicate (length elligible) $ Map.fromList [(pivot, 1)]
+    zs = zip3 ques0 labelssA0 labelssB0
+    areIso' (q0, labelsA0, labelsB0) = areIso q0 labelsA0 labelsB0 labels0 Set.empty
+    labelNodes [] labels nextLabels = (labels,nextLabels)
+    labelNodes (x:xs) labels nextLabels = if (Map.member x labels) then
+                                  labelNodes xs labels nextLabels
+                               else
+                                  labelNodes xs (Map.insert x (head nextLabels) labels) (tail nextLabels)
+
+  --  padj = getAdjacentNodes pivot
+  --  res = any (\x -> areIsomorphic [x]) elligible
+  --  areIsomorphic [] = True -- check, this should be queue, not stack
+  --  areIsomorphic queue = undefined
+  --  res' = if length elligible == 0 then False else res
