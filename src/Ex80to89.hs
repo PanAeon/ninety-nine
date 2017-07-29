@@ -253,5 +253,27 @@ depthfirst (Graph vertices edges) x = depth [x] Set.empty
 
 -- Write a predicate that splits a graph into its connected components.
 
-connectedComponents :: (Eq a, Ord a) => Graph a -> [Set.Set a]
-connectedComponents = undefined
+connectedComponents :: (Eq a, Ord a) => Graph a -> [[a]]
+connectedComponents g@(Graph vs es) = conn' $  vs
+    where
+      conn' [] = []
+      conn' (x:xs) = cs : conn' (xs \\ cs)
+        where
+          cs = depthfirst g x
+
+-- Problem 89
+-- Bipartite graph
+-- (I) assume that graph is connected
+bipartite :: (Eq a, Ord a) => Graph a -> Bool
+bipartite g@(Graph vs edges) = bip' [(head vs, 'u')] Set.empty Set.empty
+     where
+       getAdj x = getAdjacentNodes x edges
+       adjToV x = map (\y -> (y, 'v')) (getAdjacentNodesInOrder x edges)
+       adjToU x = map (\y -> (y, 'u')) (getAdjacentNodesInOrder x edges)
+       bip' [] u v = True
+       bip' ((x, 'u'):xs) u v | Set.member x u = bip' xs u v
+                              | Set.member x v = False
+                              | otherwise = bip' (adjToV x ++ xs) (Set.insert x u) v
+       bip' ((x, 'v'):xs) u v | Set.member x v = bip' xs u v
+                              | Set.member x u = False
+                              | otherwise = bip' (adjToU x ++ xs) u (Set.insert x v)
