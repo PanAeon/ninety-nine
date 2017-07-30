@@ -26,6 +26,7 @@ library
                      , Ex61to69
                      , Ex70to73
                      , Ex80to89
+                     , QueensLogic.QueensLogic
                      , Continuations
                      , Kata11SortingItOut
   build-depends:       base >= 4.7 && < 5
@@ -37,6 +38,8 @@ library
                      , unordered-containers
                      , monad-loops
                      , pqueue
+                     , logict
+                     , vector
   default-language:    Haskell2010
 
 executable ninety-nine-exe
