@@ -11,16 +11,17 @@ module Ex21to28
 
 
 
-import Control.Monad
-import Control.Applicative
-import Control.Arrow((&&&))
-import Data.List(tails, group, unfoldr,sortBy, sortOn, concat, sort, find, groupBy)
-import Data.Maybe(listToMaybe, fromJust)
-import Data.List.Zipper
-import System.Random
-import Ex11to20(removeAt')
-import qualified Data.Map as Map
-import Data.Function(on)
+import           Control.Applicative
+import           Control.Arrow       ((&&&))
+import           Control.Monad
+import           Data.Function       (on)
+import           Data.List           (concat, find, group, groupBy, sort,
+                                      sortBy, sortOn, tails, unfoldr)
+import           Data.List.Zipper
+import qualified Data.Map            as Map
+import           Data.Maybe          (fromJust, listToMaybe)
+import           Ex11to20            (removeAt')
+import           System.Random
 
 -- zippers ! yay
 insertAt':: Int -> a -> [a] -> [a]

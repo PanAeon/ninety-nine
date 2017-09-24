@@ -8,15 +8,15 @@ data Node a = DeadEnd a
 
 
 get :: Node a -> a
-get (DeadEnd a) = a
+get (DeadEnd a)   = a
 get (Passage a _) = a
-get (Fork a _ _) = a
+get (Fork a _ _)  = a
 
 
 put :: a -> Node a -> Node a
-put a (DeadEnd _) = DeadEnd a
+put a (DeadEnd _)   = DeadEnd a
 put a (Passage _ n) = Passage a n
-put a (Fork _ l r) = Fork a l r
+put a (Fork _ l r)  = Fork a l r
 
 type Zipper a = (Thread a, Node a)
 
@@ -31,7 +31,7 @@ branchRight (Fork x l r) = TurnRight x l
 
 turnRight :: Zipper a -> Maybe (Zipper a)
 turnRight (ts, Fork a l r) = Just ((TurnRight a l):ts, r)
-turnRight _ = Nothing
+turnRight _                = Nothing
 
 -- turnLeft :: Thread -> Thread
 -- turnLeft ts = ts ++ [TurnLeft] -- notice ugly right append!!!
