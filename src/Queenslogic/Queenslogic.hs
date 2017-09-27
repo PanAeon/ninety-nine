@@ -2,7 +2,7 @@
 {-# LANGUAGE MonadComprehensions #-}
 {-# LANGUAGE Rank2Types          #-}
 
-module Queenslogic.QueensLogic where
+module Queenslogic.Queenslogic where
 
 import           Control.Monad.Logic
 import           Data.List           (intersect)

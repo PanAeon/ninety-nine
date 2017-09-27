@@ -26,9 +26,10 @@ library
                      , Ex61to69
                      , Ex70to73
                      , Ex80to89
-                     , QueensLogic.QueensLogic
+                     , Queenslogic.Queenslogic
                      , Continuations
                      , Kata11SortingItOut
+                     , HaskellForAll.ComposableStreamingFolds
   build-depends:       base >= 4.7 && < 5
                      , mtl >= 2.2.1
                      , transformers
@@ -40,6 +41,8 @@ library
                      , pqueue
                      , logict
                      , vector
+                     , lens
+                     , strict
   default-language:    Haskell2010
 
 executable ninety-nine-exe
