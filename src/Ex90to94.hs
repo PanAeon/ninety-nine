@@ -13,12 +13,14 @@ import Control.Monad.Loops(iterateWhile, unfoldM)
 import Control.Applicative(liftA, Alternative, many)
 import Control.Monad(ap, MonadPlus, mplus)
 import qualified Control.Applicative as App
+import Data.Map.Strict(Map)
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
-
+import Data.IntMap.Strict (IntMap)
+import qualified Data.IntMap.Strict as IM
 
 -------- Eight queens, finaly ------------
-
+-- FIXME: write bloody your own version
 type Pos = (Int, Int)
 
 -- super lame)
@@ -55,3 +57,33 @@ nqueens n = foldl f [[]] [1..n]
       k = (fromIntegral $ y1 - y0) / (fromIntegral $ x1 - x0)
     sameRowOrCol (x0, y0) (x1, y1) = x0 == x1 || y0 == y1
     notThreatening  xs q = all (\x -> (not $ sameDiagonal q x) && (not $ sameRowOrCol q x) ) xs
+
+data Neuron = Neuron Int Int deriving (Eq, Show)
+
+knightsTour :: Int -> [(Int, Int)]
+knightsTour = undefined
+  where
+    x = 3
+-- FIXME randomize activations
+initNeurons :: Int -> Map (Int, Int) Neuron
+initNeurons n = Map.fromList  [ ((i, j), Neuron 0 0) |
+                                 i <- [0..n*n],
+                                 j <- validMoves i n]
+
+validMoves k n = [packCoords x y n | dx <- [-1,-2,1,2],
+                                     dy <- [-1,-2,1,2],
+                                     let x = x0 + dx,
+                                     let y = y0 + dy,
+                                     abs dx /= abs dy,
+                                     x >= 0 && x < n,
+                                     y >= 0 && y < n]
+  where
+    (x0, y0) = unpackCoords k n
+
+toKey :: Int -> Int -> Int -> Int
+toKey a b n = a + b * (n * n) 
+
+
+
+packCoords i j n = i + j * n
+unpackCoords k n = (k `mod` n, k `div` n)
