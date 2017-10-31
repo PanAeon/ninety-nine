@@ -18,6 +18,8 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import Data.IntMap.Strict (IntMap)
 import qualified Data.IntMap.Strict as IM
+import System.Random
+import System.IO.Unsafe
 
 -------- Eight queens, finaly ------------
 -- FIXME: write bloody your own version
@@ -64,11 +66,79 @@ knightsTour :: Int -> [(Int, Int)]
 knightsTour = undefined
   where
     x = 3
--- FIXME randomize activations
+
+
+-- FIXME: iterate !! std until
+-- FIXME: use normal random monad
+
+isKnightTour :: Int  -> [(Int, Int)] -> Bool
+isKnightTour n xs = length xs == (n*n) && allElementsAppearExactlyTwice
+   where
+     allElementsAppearExactlyTwice = undefined
+     ys = xs >>= \x -> [fst x, snd x]
+
+
+runNetwork :: Randomz -> Int -> Map (Int, Int) Int
+runNetwork rz n = runNetwork' 0 limit n u0 v0
+  where
+    limit = 200
+    u0 = initU n
+    v0 = initV rz n
+    --getV (_, v, _) = v
+
+runNetwork' :: Int -> Int -> Int -> Map (Int, Int) Int -> Map (Int, Int) Int -> Map (Int, Int) Int
+runNetwork' s limit n _U _V
+       | s > limit = error "doesn't converge"
+       | otherwise = if go then
+                       runNetwork' (s + 1) limit n _U' _V'
+                     else
+                       _V
+     where
+       (_U', _V', go) = runStep n _U _V
+
+runStep :: Int -> Map (Int, Int) Int -> Map (Int, Int) Int -> (Map (Int, Int) Int, Map (Int, Int) Int, Bool)
+runStep n _U _V = (_U', _V', nChanged > 0)
+  where
+    _U' = Map.mapWithKey updateU _U
+    updateU (i,j) u = u + 2 - sum (fmap (_V Map.! ) ((neighbours i n) ++ (neighbours j n)))
+    _V' = Map.mapWithKey updateV _V
+    updateV n@(i,j) v
+       | _U Map.! n > 3 = 1
+       | _U Map.! n < 0 = 0
+       | otherwise      = v
+    nChanged = Map.foldlWithKey (\s n v -> s + updateV n v) 0 _V
+
+
+neighbours :: Int -> Int -> [(Int, Int)]
+neighbours i n = normalize <$> validMoves i n
+  where
+    normalize j =  if i > j then
+                      (i, j)
+                    else
+                      (j, i)
+
+type Randomz = [Int]
+-- neighbours' :: Int -> Int -> Int -> [(Int, Int)]
+-- neighbours' i j n = undefined
+
+-- state function
+initU :: Int -> Map (Int, Int) Int
+initU n = Map.fromList $ zip (genMoves n) (repeat 0)
+
+-- outputs
+initV :: Randomz -> Int -> Map (Int, Int) Int
+initV rz n = Map.fromList $ zip (genMoves n) rz
+
 initNeurons :: Int -> Map (Int, Int) Neuron
-initNeurons n = Map.fromList  [ ((i, j), Neuron 0 0) |
-                                 i <- [0..n*n],
-                                 j <- validMoves i n]
+initNeurons n = Map.fromList $ foo <$> zip (genMoves n) randomz
+  where
+    foo (c, r) = (c, Neuron 0 r)
+
+genMoves :: Int -> [(Int, Int)]
+genMoves n = [ (i, j) |
+               i <- [0..n*n-1],
+               j <- validMoves i n,
+               i > j]
 
 validMoves k n = [packCoords x y n | dx <- [-1,-2,1,2],
                                      dy <- [-1,-2,1,2],
@@ -81,9 +151,13 @@ validMoves k n = [packCoords x y n | dx <- [-1,-2,1,2],
     (x0, y0) = unpackCoords k n
 
 toKey :: Int -> Int -> Int -> Int
-toKey a b n = a + b * (n * n) 
+toKey a b n = a + b * (n * n)
 
-
+{-# NOINLINE randomz #-}
+randomz :: [Int]
+randomz = drop 58 $ randomRs (0, 1) g
+  where
+    g = unsafePerformIO getStdGen
 
 packCoords i j n = i + j * n
 unpackCoords k n = (k `mod` n, k `div` n)
