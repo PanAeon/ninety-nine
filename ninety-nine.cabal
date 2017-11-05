@@ -29,6 +29,7 @@ library
                      , Queenslogic.Queenslogic
                      , Continuations
                      , Kata11SortingItOut
+                     , Knapsack
                      , HaskellForAll.ComposableStreamingFolds
                      , Lens.WikiTutorial
   build-depends:       base >= 4.7 && < 5
@@ -44,6 +45,7 @@ library
                      , vector
                      , lens
                      , strict
+                     , array
   default-language:    Haskell2010
 
 executable ninety-nine-exe
