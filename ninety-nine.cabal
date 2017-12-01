@@ -27,6 +27,8 @@ library
                      , Ex61to69
                      , Ex70to73
                      , Ex80to89
+                     , Ex90to94
+                     , Ex95to99
                      , Queenslogic.Queenslogic
                      , Continuations
                      , Kata11SortingItOut
