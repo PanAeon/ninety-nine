@@ -153,7 +153,7 @@ printSudoku xs = (zip xs [1..]) >>= foo
     printDigit i | i == 0 = "."
                  | otherwise = (show i)
 
-
+-- TODO: constraint solver, paper && pencil, other solutions
 solveSudoku :: PlainSudoku -> Maybe PlainSudoku
 solveSudoku s0 = fmap implodeSudoku $ listToMaybe  (itrt sE 0)
   where
@@ -161,10 +161,10 @@ solveSudoku s0 = fmap implodeSudoku $ listToMaybe  (itrt sE 0)
 
     -- FIXME: replace this stupid, recursive solution
     itrt s i =  if i == 81 then [s] else (genNext s i) >>= (\s ->
-                        if i == 81 then
-                          [s]
-                        else
                           itrt s (i+1))
+
+
+
 
 genNext s@(ExplodedSudoku rs cs bs ds) i =
   if ds !! i > 0 then
