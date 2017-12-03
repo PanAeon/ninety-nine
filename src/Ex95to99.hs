@@ -19,6 +19,8 @@ import qualified Data.Set as Set
 import qualified Data.Vector as V
 import Data.IntSet (IntSet)
 import qualified Data.IntSet as IntSet
+import Data.Maybe(listToMaybe)
+import Debug.Trace
 -- Problem 95
 
 -- (**) English number words
@@ -61,7 +63,7 @@ fullWords n = intercalate "-" wordz
 type PlainSudoku = [Int]
 
 -- rows, cols, boxes
-data ExplodedSudoku = ExplodedSudoku [IntSet] [IntSet] [IntSet]
+data ExplodedSudoku = ExplodedSudoku [IntSet] [IntSet] [IntSet] [Int] deriving Show
 
 -- TODO: put two spaces between middle digits
 -- TODO: parse output
@@ -79,18 +81,67 @@ exampleSudoku = [ 0, 0, 4,  8, 0, 0,  0, 1, 7,
                   2, 4, 0,  0, 0, 1,  5, 0, 0
                   ]
 
+toughest :: [Int]
+toughest      = [ 0, 0, 5,  3, 0, 0,  0, 0, 0,
+                  8, 0, 0,  0, 0, 0,  0, 2, 0,
+                  0, 7, 0,  0, 1, 0,  5, 0, 0,
+
+                  4, 0, 0,  0, 0, 5,  3, 0, 0,
+                  0, 1, 0,  0, 7, 0,  0, 0, 6,
+                  0, 0, 3,  2, 0, 0,  0, 8, 0,
+
+                  0, 6, 0,  5, 0, 0,  0, 0, 9,
+                  0, 0, 4,  0, 0, 0,  0, 3, 0,
+                  0, 0, 0,  0, 0, 9,  7, 0, 0
+                  ]
+
+impossible :: [Int]
+impossible = [ 0, 0, 0, 0, 0, 5, 0, 8, 0,
+               0, 0, 0, 6, 0, 1, 0, 4, 3,
+               0, 0, 0, 0, 0, 0, 0, 0, 0,
+               0, 1, 0, 5, 0, 0, 0, 0, 0,
+               0, 0, 0, 1, 0, 6, 0, 0, 0,
+               3, 0, 0, 0, 0, 0, 0, 0, 5,
+               5, 3, 0, 0, 0, 0, 0, 6, 1,
+               0, 0, 0, 0, 0, 0, 0, 0, 4,
+               0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 -- TODO: all right encode later, try to solve with plain lists
 
 explodeSudoku :: PlainSudoku -> ExplodedSudoku
-explodeSudoku xs = ExplodedSudoku rows cols boxes
+explodeSudoku xs = ExplodedSudoku rows cols boxes xs
   where
-    (rows, cols, boxes) = foldl f  ([], [], []) (zip xs [0..])
-    f (rs, cs, bs) (x, i) = undefined
-    row i = i div 9
-    col i = i mod 9
-    box i = undefined
+    (rows, cols, boxes) = foldl f  (emptyLine, emptyLine, emptyLine) (zip xs [0..])
+    f (rs, cs, bs) (x, i) = if x == 0 then
+                              (rs, cs, bs)
+                            else
+                              (sUpdate (sRow i) x rs, sUpdate (sCol i) x cs, sUpdate (sBox i) x bs)
+    emptyLine = take 9 (repeat IntSet.empty)
 
 
+
+sRow i = i `div` 9
+sCol i = i `mod` 9
+sBox i =  r * 3 + c
+  where
+    r = sRow i `div` 3
+    c = sCol i `div` 3
+
+sUpdate :: Int -> Int -> [IntSet] -> [IntSet]
+sUpdate i x xs = bs ++ (a':as)
+  where
+    (bs, a:as) = splitAt i xs
+    a' = IntSet.insert x a
+
+lUpdate :: Int -> Int -> [Int] -> [Int]
+lUpdate i x xs = bs ++ (x:as)
+  where
+    (bs, _:as) = splitAt i xs
+
+sContains :: Int -> Int -> [IntSet] -> Bool
+sContains i x xs = IntSet.member x (xs !! i)
+
+implodeSudoku :: ExplodedSudoku -> PlainSudoku
+implodeSudoku (ExplodedSudoku _ _ _ ds) = ds
 
 printSudoku :: PlainSudoku -> String
 printSudoku xs = (zip xs [1..]) >>= foo
@@ -103,5 +154,27 @@ printSudoku xs = (zip xs [1..]) >>= foo
                  | otherwise = (show i)
 
 
-solveSudoku :: PlainSudoku -> PlainSudoku
-solveSudoku = undefined
+solveSudoku :: PlainSudoku -> Maybe PlainSudoku
+solveSudoku s0 = fmap implodeSudoku $ listToMaybe  (itrt sE 0)
+  where
+    sE = explodeSudoku s0
+
+    -- FIXME: replace this stupid, recursive solution
+    itrt s i =  if i == 81 then [s] else (genNext s i) >>= (\s ->
+                        if i == 81 then
+                          [s]
+                        else
+                          itrt s (i+1))
+
+genNext s@(ExplodedSudoku rs cs bs ds) i =
+  if ds !! i > 0 then
+    [s]
+  else
+    [1..9] >>= (\x ->
+       if sContains (sRow i) x rs || sContains (sCol i) x cs || sContains (sBox i) x bs then
+         []
+       else
+         [ExplodedSudoku (sUpdate (sRow i) x rs) (sUpdate (sCol i) x cs) (sUpdate (sBox i) x bs) (lUpdate i x ds)]
+    )
+-- putStrLn $ head  $ fmap (printSudoku .  implodeSudoku) $ genNext (explodeSudoku exampleSudoku) 1
+-- [9,3,4,8,5,2,0,1,7,6,7,0,9,0,0,0,0,0,5,0,8,0,3,0,0,0,4,3,0,0,7,4,0,1,0,0,0,6,9,0,0,0,7,8,0,0,0,1,0,6,9,0,0,5,1,0,0,0,8,0,3,0,6,0,0,0,0,0,6,0,9,1,2,4,0,0,0,1,5,0,0]
