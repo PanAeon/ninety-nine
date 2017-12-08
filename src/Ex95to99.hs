@@ -37,6 +37,29 @@ fullWords n = intercalate "-" wordz
     wrdz = V.fromList ["zero", "one", "two", "three", "four",
                   "five", "six", "seven", "eight", "nine"]
 
+-- syntax checker
+
+identifier :: String -> Bool
+identifier = iStart
+  where
+    iStart []     = False
+    iStart (x:xs) = isLetter x && iRest xs
+
+    iRest []     = True
+    iRest (x:xs) = if x == '-' then
+                     isLetterOrDigit xs
+                   else
+                     isLetterOrDigit (x:xs)
+
+    isLetterOrDigit [] = False
+    isLetterOrDigit (x:xs) = (isLetter x || isDigit x) && iRest xs
+
+    isLetter x =  x `elem`  ['a'..'z']
+    isDash   x = x == '-'
+    isDigit x = x `elem` ['0'..'9']
+
+
+
         -- .  .  4 | 8  .  . | .  1  7	     9  3  4 | 8  2  5 | 6  1  7
         --         |         |                          |         |
         -- 6  7  . | 9  .  . | .  .  .	     6  7  2 | 9  1  4 | 8  5  3
