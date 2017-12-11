@@ -37,3 +37,39 @@ m = 9
 should get 16,
 test refactoring
 -}
+
+-- now with fold
+knapsack' :: Int -> Vector Int -> Vector Int -> Int
+knapsack' maxWeight values weights = V.unsafeIndex result maxWeight
+  where
+    n = V.length values
+    firstRow = V.replicate (maxWeight + 1) 0
+    result = foldl (\row i ->
+               V.fromList $ 0 : (
+                 fmap (\j ->
+                   if  j - V.unsafeIndex weights (i-1) >= 0
+                   then
+                     max (V.unsafeIndex row j) (V.unsafeIndex row (j - (V.unsafeIndex weights (i - 1))) + (V.unsafeIndex values (i - 1)))
+                   else
+                     V.unsafeIndex row j
+                 ) [1..maxWeight]
+               )
+             ) firstRow [1..n]
+{-
+def knapsackFold(maxWeight: Int, value: Vector[Int], weight: Vector[Int]): Int = {
+    val N = value.length
+
+    val s0 = Vector.fill(maxWeight + 1)(0)
+
+    val res = (1 to N).foldLeft(s0) { (s, i) =>
+      0 +: ((1 to maxWeight).map { j =>
+        if( j - weight(i - 1) >= 0 ) {
+          math.max(s(j), s(j - weight(i - 1)) + value(i - 1))
+        } else {
+          s(j)
+        }
+      }).toVector
+    }
+    res(maxWeight)
+  }
+-}
