@@ -2,6 +2,7 @@ module Dynamic() where
 
 import Data.Vector(Vector)
 import qualified Data.Vector as V
+import qualified Data.List as L
 
 
 -- see: https://www.cakesolutions.net/teamblogs/solving-dynamic-programming-problems-using-functional-programming-part-4
@@ -38,6 +39,7 @@ should get 16,
 test refactoring
 -}
 
+
 -- now with fold
 knapsack' :: Int -> Vector Int -> Vector Int -> Int
 knapsack' maxWeight values weights = V.unsafeIndex result maxWeight
@@ -73,3 +75,5 @@ def knapsackFold(maxWeight: Int, value: Vector[Int], weight: Vector[Int]): Int =
     res(maxWeight)
   }
 -}
+
+
