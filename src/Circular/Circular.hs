@@ -1,4 +1,4 @@
-module Circular() where
+module Circular.Circular() where
 
 -- Nice post, lots of links
 -- http://izzycecil.com/posts/2015-07-29-circular.html

@@ -1,87 +1,212 @@
-name:                ninety-nine
-version:             0.1.0.0
--- synopsis:
--- description:
-homepage:            https://github.com/githubuser/ninety-nine#readme
-license:             BSD3
-license-file:        LICENSE
-author:              Author name here
-maintainer:          example@example.com
-copyright:           2017 Author name here
-category:            Web
-build-type:          Simple
-extra-source-files:  README.md
-cabal-version:       >=1.10
+-- This file has been generated from package.yaml by hpack version 0.20.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 483a10de3b264a8292ed4421c69853c29e5822ece5d20daeb8003a002dd441ee
 
-library
-  hs-source-dirs:      src
-                     , src/kata
-                     , src/wfpm
-  exposed-modules:     Lib
-                     , Luhn
-                     , Ex11to20
-                     , Ex21to28
-                     , Ex31to41
-                     , Ex46to50
-                     , Ex54to60
-                     , Ex61to69
-                     , Ex70to73
-                     , Ex80to89
-                     , Ex90to94
-                     , Ex95to99
-                     , Queenslogic.Queenslogic
-                     , Continuations
-                     , Kata11SortingItOut
-                     , Knapsack
-                     , HaskellForAll.ComposableStreamingFolds
-                     , Lens.WikiTutorial
-                     , WhyFPMatters
-                     , Dynamic
-  build-depends:       base >= 4.7 && < 5
-                     , mtl >= 2.2.1
-                     , transformers
-                     , ListZipper
-                     , random
-                     , containers
-                     , unordered-containers
-                     , monad-loops
-                     , pqueue
-                     , logict
-                     , vector
-                     , lens
-                     , strict
-                     , array
-  default-language:    Haskell2010
+name:           ninety-nine
+version:        0.1.0.0
+synopsis:       Short description of your package
+description:    Please see the README on Github at <https://github.com/githubuser/lens-over-tea#readme>
+homepage:       https://github.com/githubuser/githubuser#readme
+bug-reports:    https://github.com/githubuser/githubuser/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2017 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
 
-executable ninety-nine-exe
-  hs-source-dirs:      app
-  main-is:             Main.hs
-  ghc-options:         -rtsopts -with-rtsopts=-N
-  build-depends:       base
-                     , ninety-nine
-  default-language:    Haskell2010
-
-
-
-test-suite ninety-nine-test
-  type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
-  main-is:             Spec.hs
-  build-depends:       base
-                     , ninety-nine
-                     , hspec
-                     , QuickCheck
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
-  other-modules:       HS99ListsISpec
-                     , LuhnSpec
-                     , Ex11to20Spec
-                     , Ex21to28Spec
-                     , Ex31to41Spec
-                     , Ex46to50Spec
-                     , Ex54to60Spec
-                     , Ex61to69Spec
-  default-language:    Haskell2010
+extra-source-files:
+    README.md
 
 source-repository head
-  type:     git
-  location: https://github.com/githubuser/ninety-nine
+  type: git
+  location: https://github.com/githubuser/githubuser
+  subdir: ninety-nine
+
+library
+  hs-source-dirs:
+      src
+  build-depends:
+      ListZipper
+    , array
+    , base >=4.7 && <5
+    , containers
+    , lens
+    , logict
+    , monad-loops
+    , mtl
+    , pqueue
+    , random
+    , strict
+    , transformers
+    , unordered-containers
+    , vector
+  exposed-modules:
+      Circular.Circular
+      Circular.CircularList
+      Continuations
+      Ex11to20
+      Ex21to28
+      Ex31to41
+      Ex46to50
+      Ex54to60
+      Ex61to69
+      Ex70to73
+      Ex80to89
+      Ex90to94
+      Ex95to99
+      HaskellForAll.BeautifulFolding
+      HaskellForAll.ComposableStreamingFolds
+      HaskellForAll.FunctionalMonoid
+      Labirinth
+      Lens.HelloLens
+      Lens.LensOverTea
+      Lens.WikiTutorial
+      Lib
+      Luhn
+      Polymorphism.Poly
+      Queenslogic.MyQueensLogic
+      Queenslogic.Queenslogic
+  other-modules:
+      Paths_ninety_nine
+  default-language: Haskell2010
+
+executable dining-philosophers-exe
+  main-is: Main.hs
+  hs-source-dirs:
+      app/philosophers
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      ListZipper
+    , array
+    , base >=4.7 && <5
+    , containers
+    , lens
+    , logict
+    , monad-loops
+    , mtl
+    , ninety-nine
+    , pqueue
+    , random
+    , strict
+    , transformers
+    , unordered-containers
+    , vector
+  other-modules:
+      Paths_ninety_nine
+  default-language: Haskell2010
+
+executable ninety-nine-exe
+  main-is: Main.hs
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      ListZipper
+    , array
+    , base >=4.7 && <5
+    , containers
+    , lens
+    , logict
+    , monad-loops
+    , mtl
+    , ninety-nine
+    , pqueue
+    , random
+    , strict
+    , transformers
+    , unordered-containers
+    , vector
+  other-modules:
+      Paths_ninety_nine
+  default-language: Haskell2010
+
+executable philosophers-with-mutex-exe
+  main-is: Main.hs
+  hs-source-dirs:
+      app/philosophers-with-mutex
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      ListZipper
+    , array
+    , base >=4.7 && <5
+    , containers
+    , lens
+    , logict
+    , monad-loops
+    , mtl
+    , ninety-nine
+    , pqueue
+    , random
+    , strict
+    , transformers
+    , unordered-containers
+    , vector
+  other-modules:
+      Paths_ninety_nine
+  default-language: Haskell2010
+
+executable philosophers-with-stm-exe
+  main-is: Main.hs
+  hs-source-dirs:
+      app/philosophers-stm
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      ListZipper
+    , array
+    , base >=4.7 && <5
+    , containers
+    , lens
+    , logict
+    , monad-loops
+    , mtl
+    , ninety-nine
+    , pqueue
+    , random
+    , stm
+    , strict
+    , transformers
+    , unordered-containers
+    , vector
+  other-modules:
+      Paths_ninety_nine
+  default-language: Haskell2010
+
+test-suite ninety-nine-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      ListZipper
+    , QuickCheck
+    , array
+    , base >=4.7 && <5
+    , containers
+    , hspec
+    , lens
+    , logict
+    , monad-loops
+    , mtl
+    , ninety-nine
+    , pqueue
+    , random
+    , strict
+    , transformers
+    , unordered-containers
+    , vector
+  other-modules:
+      Ex11to20Spec
+      Ex21to28Spec
+      Ex31to41Spec
+      Ex46to50Spec
+      Ex54to60Spec
+      Ex61to69Spec
+      HS99ListsISpec
+      LuhnSpec
+      Paths_ninety_nine
+  default-language: Haskell2010

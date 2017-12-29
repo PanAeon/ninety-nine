@@ -1,16 +1,16 @@
 {-# LANGUAGE FlexibleInstances   #-}
 {-# LANGUAGE MonadComprehensions #-}
-{-# LANGUAGE Rank2Types          #-}
-
+{-# LANGUAGE RankNTypes          #-}
+--
 module Queenslogic.MyQueensLogic where
-
+--
 import           Control.Monad.Logic
 import           Data.List           (intersect)
-
--- FIXME: write one from scratch in a month!
+--
+-- -- FIXME: write one from scratch in a month!
 instance Show a => Show (Logic a) where
-    show l = "Logic> " ++ show $ observeAll l
-
+    show l = "Logic> " ++ (show $ observeAll l)
+--
 -- FIXME: what is choices?
 choices :: MonadLogic m => [a] -> m a
 choices = msum . map return
@@ -39,7 +39,7 @@ diags (x,y) = [
               ]
 
 isSafeToInsert :: Square -> Q -> Bool
-isSafeToInsert s qs = null $ diags s `intersect` underThreat 
+isSafeToInsert s qs = null $ diags s `intersect` underThreat
    where
       qs' = zip [1..length qs]  qs
       underThreat = qs' >>= diags

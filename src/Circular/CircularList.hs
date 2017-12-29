@@ -1,4 +1,4 @@
-module CircularList() where
+module Circular.CircularList() where
 
 -- replace list elements by minimum value
 

@@ -1,0 +1,92 @@
+name:                ninety-nine
+version:             0.1.0.0
+github:              githubuser/githubuser/ninety-nine
+license:             BSD3
+author:              Author name here
+maintainer:          example@example.com
+copyright:           2017 Author name here
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on Github at <https://github.com/githubuser/lens-over-tea#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- mtl
+- transformers
+- ListZipper
+- random
+- containers
+- unordered-containers
+- monad-loops
+- pqueue
+- logict
+- vector
+- lens
+- strict
+- array
+
+library:
+  source-dirs: src
+
+
+executables:
+  ninety-nine-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - ninety-nine
+  dining-philosophers-exe:
+    main:                Main.hs
+    source-dirs:         app/philosophers
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - ninety-nine
+  philosophers-with-mutex-exe:
+    main:                Main.hs
+    source-dirs:         app/philosophers-with-mutex
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - ninety-nine
+  philosophers-with-stm-exe:
+    main:                Main.hs
+    source-dirs:         app/philosophers-stm
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - stm
+    - ninety-nine
+
+tests:
+  ninety-nine-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - ninety-nine
+    - hspec
+    - QuickCheck
