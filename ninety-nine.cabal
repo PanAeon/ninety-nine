@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 483a10de3b264a8292ed4421c69853c29e5822ece5d20daeb8003a002dd441ee
+-- hash: ec39c77fa05555453c77eb73e1ec3f7b677325be944cabf6e309e4f35648779e
 
 name:           ninety-nine
 version:        0.1.0.0
@@ -33,7 +33,10 @@ library
       ListZipper
     , array
     , base >=4.7 && <5
+    , bytestring
+    , comonad
     , containers
+    , contravariant
     , lens
     , logict
     , monad-loops
@@ -47,6 +50,9 @@ library
   exposed-modules:
       Circular.Circular
       Circular.CircularList
+      Comonads.CellularAutomata
+      Comonads.SimpleCellularAutomata
+      Comonads.StoreMk
       Continuations
       Ex11to20
       Ex21to28
@@ -67,34 +73,10 @@ library
       Lens.WikiTutorial
       Lib
       Luhn
+      Manatee.Variance
       Polymorphism.Poly
       Queenslogic.MyQueensLogic
       Queenslogic.Queenslogic
-  other-modules:
-      Paths_ninety_nine
-  default-language: Haskell2010
-
-executable dining-philosophers-exe
-  main-is: Main.hs
-  hs-source-dirs:
-      app/philosophers
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      ListZipper
-    , array
-    , base >=4.7 && <5
-    , containers
-    , lens
-    , logict
-    , monad-loops
-    , mtl
-    , ninety-nine
-    , pqueue
-    , random
-    , strict
-    , transformers
-    , unordered-containers
-    , vector
   other-modules:
       Paths_ninety_nine
   default-language: Haskell2010
@@ -108,7 +90,10 @@ executable ninety-nine-exe
       ListZipper
     , array
     , base >=4.7 && <5
+    , bytestring
+    , comonad
     , containers
+    , contravariant
     , lens
     , logict
     , monad-loops
@@ -116,57 +101,6 @@ executable ninety-nine-exe
     , ninety-nine
     , pqueue
     , random
-    , strict
-    , transformers
-    , unordered-containers
-    , vector
-  other-modules:
-      Paths_ninety_nine
-  default-language: Haskell2010
-
-executable philosophers-with-mutex-exe
-  main-is: Main.hs
-  hs-source-dirs:
-      app/philosophers-with-mutex
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      ListZipper
-    , array
-    , base >=4.7 && <5
-    , containers
-    , lens
-    , logict
-    , monad-loops
-    , mtl
-    , ninety-nine
-    , pqueue
-    , random
-    , strict
-    , transformers
-    , unordered-containers
-    , vector
-  other-modules:
-      Paths_ninety_nine
-  default-language: Haskell2010
-
-executable philosophers-with-stm-exe
-  main-is: Main.hs
-  hs-source-dirs:
-      app/philosophers-stm
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      ListZipper
-    , array
-    , base >=4.7 && <5
-    , containers
-    , lens
-    , logict
-    , monad-loops
-    , mtl
-    , ninety-nine
-    , pqueue
-    , random
-    , stm
     , strict
     , transformers
     , unordered-containers
@@ -186,7 +120,10 @@ test-suite ninety-nine-test
     , QuickCheck
     , array
     , base >=4.7 && <5
+    , bytestring
+    , comonad
     , containers
+    , contravariant
     , hspec
     , lens
     , logict
