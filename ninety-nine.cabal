@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ec39c77fa05555453c77eb73e1ec3f7b677325be944cabf6e309e4f35648779e
+-- hash: 8a50b4fb26e03ad6421b03c3c57732d83e63a8bf5f18df133ffeb1fe4c655a41
 
 name:           ninety-nine
 version:        0.1.0.0
@@ -73,6 +73,7 @@ library
       Lens.WikiTutorial
       Lib
       Luhn
+      Manatee.LazyLambda
       Manatee.Variance
       Polymorphism.Poly
       Queenslogic.MyQueensLogic
