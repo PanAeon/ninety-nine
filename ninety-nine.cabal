@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8a50b4fb26e03ad6421b03c3c57732d83e63a8bf5f18df133ffeb1fe4c655a41
+-- hash: db7793d5a3f11213bc0151c62405241acfdc4ab545c5bdb18f4ce97e758518ed
 
 name:           ninety-nine
 version:        0.1.0.0
@@ -42,6 +42,7 @@ library
     , monad-loops
     , mtl
     , pqueue
+    , probability
     , random
     , strict
     , transformers
@@ -53,7 +54,9 @@ library
       Comonads.CellularAutomata
       Comonads.SimpleCellularAutomata
       Comonads.StoreMk
+      Cont.MyCont
       Continuations
+      Distributions.Part1
       Ex11to20
       Ex21to28
       Ex31to41
@@ -64,6 +67,8 @@ library
       Ex80to89
       Ex90to94
       Ex95to99
+      FinalTagless.Original1
+      FinalTagless.Original2
       HaskellForAll.BeautifulFolding
       HaskellForAll.ComposableStreamingFolds
       HaskellForAll.FunctionalMonoid
@@ -74,6 +79,8 @@ library
       Lib
       Luhn
       Manatee.LazyLambda
+      Manatee.MaxSubarray
+      Manatee.UnderstandingYoneda
       Manatee.Variance
       Polymorphism.Poly
       Queenslogic.MyQueensLogic
@@ -101,6 +108,7 @@ executable ninety-nine-exe
     , mtl
     , ninety-nine
     , pqueue
+    , probability
     , random
     , strict
     , transformers
@@ -132,6 +140,7 @@ test-suite ninety-nine-test
     , mtl
     , ninety-nine
     , pqueue
+    , probability
     , random
     , strict
     , transformers

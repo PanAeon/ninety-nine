@@ -14,6 +14,9 @@ stack exec ghci
 stack :load src/...
 
 
+## Typed tagless
+# original paper http://okmij.org/ftp/tagless-final/JFP.pdf
+    - lots of references
 
 
 

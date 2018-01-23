@@ -37,6 +37,8 @@ dependencies:
 - comonad
 - bytestring
 - contravariant
+- probability
+
 
 
 library:

@@ -8,6 +8,25 @@ import Control.Comonad
 import Control.Applicative
 import Data.Functor.Const
 import Data.Functor.Identity
+
+{-
+data Store s a = Store (s -> a) s deriving Functor
+
+instance Comonad (Store s) where
+   extract (Store f s) = f s
+   duplicate (Store f s) = Store (Store f) s
+
+-- characterizes store completely
+experiment :: Functor f => (s -> f s) -> Store s a -> f a
+experiment k (Store f s) = f <$> k s
+
+-}
+
+
+--- !!!!!!!!!!!!!!!!
+---  Yoneda !!
+--- !!!!!!!!!!!!!!!!
+
 -- replace with Applicative and you got the Bazaar
 newtype Pretext s a = Pretext {
     runPretext :: forall f. Functor f => (s -> f s) -> f a
@@ -92,7 +111,7 @@ instance Applicative (FunList s) where
   More s fl <*> fa = More s (flip <$> fl <*> fa) -- FunList s (s -> b)
 
 
- 
+
 -- Failed attempts for Pretext:
 
  -- (Pretext s a -> b) -> Pretext s a -> Pretext s b
