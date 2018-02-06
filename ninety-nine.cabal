@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: db7793d5a3f11213bc0151c62405241acfdc4ab545c5bdb18f4ce97e758518ed
+-- hash: 98d165ec2a88a061ea91d30f2def14ed0c584a34706c945c3db06c7fe506c14e
 
 name:           ninety-nine
 version:        0.1.0.0
@@ -54,6 +54,8 @@ library
       Comonads.CellularAutomata
       Comonads.SimpleCellularAutomata
       Comonads.StoreMk
+      Cont.HowContWork
+      Cont.Lilith
       Cont.MyCont
       Continuations
       Distributions.Part1
@@ -67,8 +69,12 @@ library
       Ex80to89
       Ex90to94
       Ex95to99
+      FinalTagless.Original
       FinalTagless.Original1
       FinalTagless.Original2
+      FinalTagless.OriginalDeBruijn
+      FinalTagless.OriginalTypecheck
+      FinalTagless.OriginalTypeclass
       HaskellForAll.BeautifulFolding
       HaskellForAll.ComposableStreamingFolds
       HaskellForAll.FunctionalMonoid
@@ -80,6 +86,8 @@ library
       Luhn
       Manatee.LazyLambda
       Manatee.MaxSubarray
+      Manatee.ReverseState
+      Manatee.TheEssenceOfFunctionalProgramming
       Manatee.UnderstandingYoneda
       Manatee.Variance
       Polymorphism.Poly

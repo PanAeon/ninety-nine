@@ -56,10 +56,12 @@ app e1 e2 env = (e1 env) (e2 env)
 -- (λx.x)True
 
 testf1 = app (lam varZ) (b True)
-testf1r = testf1 []
+testf1r  = testf1 []
 
 testf3 = app (lam (varS varZ)) (b True)
 
+
+mytest = app (lam (app (lam (varS varZ)) varZ)) (b True)
 -- testf3 [] -> Couldn't match expected type `(t, b0)' with actual type `[t0]'
 
 
