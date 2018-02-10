@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 98d165ec2a88a061ea91d30f2def14ed0c584a34706c945c3db06c7fe506c14e
+-- hash: 53b870770964fcd3a49e32b3c33a5de64b0212ec6898129ebeaec3519c8b7298
 
 name:           ninety-nine
 version:        0.1.0.0
@@ -87,6 +87,7 @@ library
       Manatee.LazyLambda
       Manatee.MaxSubarray
       Manatee.ReverseState
+      Manatee.RevisitingParsing
       Manatee.TheEssenceOfFunctionalProgramming
       Manatee.UnderstandingYoneda
       Manatee.Variance
