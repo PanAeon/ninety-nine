@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 53b870770964fcd3a49e32b3c33a5de64b0212ec6898129ebeaec3519c8b7298
+-- hash: a66cc58fe23b53eaa249905cce5f949e15bb5ce2a0f67e68b0bc0ae60618bd93
 
 name:           ninety-nine
 version:        0.1.0.0
@@ -91,6 +91,7 @@ library
       Manatee.TheEssenceOfFunctionalProgramming
       Manatee.UnderstandingYoneda
       Manatee.Variance
+      OpenRecursion.Recursion
       Polymorphism.Poly
       Queenslogic.MyQueensLogic
       Queenslogic.Queenslogic
