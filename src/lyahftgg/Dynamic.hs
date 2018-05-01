@@ -30,8 +30,7 @@ m_ways (n,m) = resultRow !! (m)
   where
     firstRow = [1 | i <- [0..m]]
     resultRow = foldl f firstRow [0..n-1]
-    f prev _ = tail $ scanl (\p l -> p + l) (0) prev
-      --(head prev) : [ j | j <- [1..m-1]]
+    f prev _ = tail $ scanl (+) (0) prev
 
 
 slow_fib :: Int -> Integer
