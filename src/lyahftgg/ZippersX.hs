@@ -1,9 +1,9 @@
-module Zippers
+module ZippersX
     (
     ) where
 
 data Tree a = Empty | Node a (Tree a) (Tree a) deriving Show
- 
+
 freeTree :: Tree Char
 freeTree =
     Node 'P'
