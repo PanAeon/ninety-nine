@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a66cc58fe23b53eaa249905cce5f949e15bb5ce2a0f67e68b0bc0ae60618bd93
+-- hash: 6631f85a33ea3eba9c7df49ec1724ca57a9f2661bbf2d0e51eaef75e8135efed
 
 name:           ninety-nine
 version:        0.1.0.0
@@ -95,6 +95,36 @@ library
       Polymorphism.Poly
       Queenslogic.MyQueensLogic
       Queenslogic.Queenslogic
+  other-modules:
+      Paths_ninety_nine
+  default-language: Haskell2010
+
+executable cidr-exe
+  main-is: Main.hs
+  hs-source-dirs:
+      app/cidr
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      ListZipper
+    , array
+    , base >=4.7 && <5
+    , bytestring
+    , comonad
+    , containers
+    , contravariant
+    , lens
+    , logict
+    , monad-loops
+    , mtl
+    , ninety-nine
+    , parsec
+    , pqueue
+    , probability
+    , random
+    , strict
+    , transformers
+    , unordered-containers
+    , vector
   other-modules:
       Paths_ninety_nine
   default-language: Haskell2010
