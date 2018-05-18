@@ -17,6 +17,7 @@ import Control.Applicative
 import Control.Monad.Identity (Identity)
 import qualified Data.Bits as Bits
 import Control.Monad(mfilter)
+import Data.List
 
 --parse rule text = Parsec.parse rule "(source)" text
 
@@ -35,7 +36,7 @@ ipFragmentP = do
 -- FIXME: find bloody combinator filterM or whatever!
 cidrBitsP = do
   n <- numberP
-  if n >= 0 && n < 33
+  if n > 0 && n < 33
   then (pure n)
   else fail $ "invalid number of cidr bits: " ++ show n
 
@@ -53,26 +54,32 @@ cidrBlockP = CidrBlock <$> ipP <* Parsec.char '/' <*> cidrBitsP
 ipRangeP = IpRange <$> ipP <* Parsec.char '-' <* ipP
 ipRangeByNumP = IpRangeByNum <$> ipP <* Parsec.spaces <* numberP
 
--- FIXME: check for overflow
--- ha, you're wrong))
-incrIps :: Ip -> Int -> Ip
-incrIps (Ip a b c d) n = Ip a' b' c' d'
+-- aha, yes, bits not in mask should be 1
+-- i.e. 255, for all masked.. count only unmasked...
+-- here's good calculator http://subnet-calculator.org/cidr.php
+-- FIXME: cidrToIpRange (CidrBlock (Ip 1 2 3 4 ) 23)
+-- fuck: fix start adddr
+incrIps :: Ip -> Int -> (Ip,Ip)
+incrIps (Ip a b c d) nBits = (Ip a'' b'' c'' d'', Ip a' b' c' d')
   where
-    d' = min 255 (n + d)
-    rd = max 0 (n + d - 255)
-    c' = min 255 (rd + c)
-    rc = max 0 (rd + c - 255)
-    b' = min 255 (rc + b)
-    rb = max 0 (rc + b - 255)
-    a' = min 255 (rb + a)
-    ra = max 0 (rb + a - 255) -- check for oferflow here..
+    n1 = nBits `div` 8
+    n2 = nBits `mod` 8
+    xs = [d, c, b, a]
+    (as, (z:zs)) = splitAt n1 xs
+    z'' = max 0 (z - 2^n2 + 1)
+    z' = min 255 (z'' + 2^n2 - 1)
+    [d', c', b', a'] = ((const 255) <$> as) ++ (z':zs)
+    [d'', c'', b'', a''] = ((const 0) <$> as) ++ (z'':zs)
+
+
 
 cidrToIpRange :: CidrBlock -> IpRange
-cidrToIpRange (CidrBlock (Ip a b c d) n) = undefined
+cidrToIpRange (CidrBlock (Ip a b c d) n) = IpRange s' e'
   where
     startAddr = Ip a b c d
     bitsLeft  = 32 - n
-    numIps = 2^bitsLeft
+    (s', e') = incrIps startAddr bitsLeft
+
 
 
 
