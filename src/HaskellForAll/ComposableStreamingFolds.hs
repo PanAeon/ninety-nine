@@ -38,6 +38,9 @@ genericLength' = Fold (\_ ->  Sum 1) (fromIntegral . getSum)
 sum' :: (Num a) => Fold a a
 sum' = Fold Sum getSum
 
+instance (Semigroup a, Semigroup b) => Semigroup (Pair a b) where
+  (aL :!: aR) <> (bL :!: bR) = (aL <> bL) :!: (aR <> bR)
+
 instance (Monoid a, Monoid b) => Monoid (Pair a b) where
   mempty = mempty :!: mempty
   mappend (aL :!: aR) (bL :!: bR) =
